@@ -15,6 +15,9 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<Tab>('holdings');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [tradeSymbol, setTradeSymbol] = useState('');
+  const [tradePrice, setTradePrice] = useState('');
+  const [tradeQty, setTradeQty] = useState('1');
   const [tradeSymbol, setTradeSymbol] = useState('AAPL');
   const [tradePrice, setTradePrice] = useState('');
   
@@ -74,6 +77,17 @@ export default function Dashboard() {
     setTradeSymbol(optionsChain ? `${optionsChain.symbol}${type === 'call' ? 'C' : 'P'}${Math.floor(strike*1000)}` : '');
     setTradePrice(price.toString());
     setActiveTab('trade');
+  };
+
+  const handleTrade = async (side: string) => {
+    if (!tradeSymbol) return;
+    const order = { symbol: tradeSymbol, qty: tradeQty || '1', side, type: 'market' };
+    try {
+      const res = await fetch('/api/alpaca', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(order) });
+      const data = await res.json();
+      if (res.ok) setMessage(`${side.toUpperCase()} ${tradeSymbol} submitted`);
+      else setMessage(`Error: ${data.message}`);
+    } catch (e: any) { setMessage(`Error: ${e.message}`); }
   };
 
   const handleOrder = async (order: any) => {
@@ -150,6 +164,9 @@ export default function Dashboard() {
             onGetOptions={getOptions}
             analyzing={analyzing}
             onSelectPrice={handleSelectPrice}
+            tradeSymbol={tradeSymbol} tradePrice={tradePrice} tradeQty={tradeQty}
+            setTradeSymbol={setTradeSymbol} setTradePrice={setTradePrice} setTradeQty={setTradeQty}
+            onTrade={handleTrade}
           />
         )}
       </div>

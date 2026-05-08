@@ -1,7 +1,17 @@
 'use client';
 
-import { Candidate, StockAnalysis, OptionsChain } from '../types';
+import { Candidate, StockAnalysis, OptionsChain, TradeProps } from '../types';
 import React, { useState } from 'react';
+
+interface TradeProps {
+  tradeSymbol?: string;
+  tradePrice?: string;
+  tradeQty?: string;
+  setTradeSymbol?: (v: string) => void;
+  setTradePrice?: (v: string) => void;
+  setTradeQty?: (v: string) => void;
+  onTrade?: (side: string) => void;
+}
 
 interface ResearchProps {
   onSelectPrice?: (strike: number, type: 'call' | 'put', price: number) => void;
