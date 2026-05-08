@@ -53,14 +53,14 @@ export function UnifiedPositionsOrdersTab({ positions, orders }: UnifiedTabProps
               </thead>
               <tbody>
                 {positions.map((p, i) => (
-                  <tr key={i} style={{ borderBottom: '1px solid #21262d' }}>
-                    <td style={{ padding: '2px', fontFamily: 'monospace', textAlign: 'center' }}>{p.symbol}</td>
-                    <td style={{ padding: '2px', textAlign: 'center' }}>{p.qty}</td>
-                    <td style={{ padding: '2px', textAlign: 'center' }}>{p.avg_entry_price}</td>
-                    <td style={{ padding: '2px', textAlign: 'center' }}>{p.current_price}</td>
-                    <td style={{ padding: '2px', color: parseFloat(p.unrealized_pl) >= 0 ? '#3fb950' : '#f85149', textAlign: 'center' }}>
-                      {p.unrealized_pl}
-                    </td>
+                  <tr key={i} style={{ borderBottom: '1px solid #21262d', cursor: 'pointer' }}
+                      onMouseEnter={e => e.currentTarget.style.background = '#1f2a3a'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                    <td style={{ padding: '2px', fontFamily: 'monospace' }}>{p.symbol}</td>
+                    <td style={{ padding: '2px' }}>{p.qty}</td>
+                    <td style={{ padding: '2px' }}>{p.avg_entry_price}</td>
+                    <td style={{ padding: '2px' }}>{p.current_price}</td>
+                    <td style={{ padding: '2px', color: parseFloat(p.unrealized_pl) >= 0 ? '#3fb950' : '#f85149' }}>{p.unrealized_pl}</td>
                   </tr>
                 ))}
               </tbody>
@@ -86,12 +86,14 @@ export function UnifiedPositionsOrdersTab({ positions, orders }: UnifiedTabProps
               </thead>
               <tbody>
                 {orders.map((o, i) => (
-                  <tr key={i} style={{ borderBottom: '1px solid #21262d' }}>
-                    <td style={{ padding: '2px', fontFamily: 'monospace', textAlign: 'center' }}>{o.symbol}</td>
-                    <td style={{ padding: '2px', color: o.side === 'buy' ? '#3fb950' : '#f85149', textAlign: 'center' }}>{o.side}</td>
-                    <td style={{ padding: '2px', textAlign: 'center' }}>{o.qty}</td>
-                    <td style={{ padding: '2px', textAlign: 'center' }}>{o.limit_price || 'market'}</td>
-                    <td style={{ padding: '2px', textAlign: 'center' }}>{o.status}</td>
+                  <tr key={i} style={{ borderBottom: '1px solid #21262d', cursor: 'pointer' }}
+                      onMouseEnter={e => e.currentTarget.style.background = '#1f2a3a'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                    <td style={{ padding: '2px', fontFamily: 'monospace' }}>{o.symbol}</td>
+                    <td style={{ padding: '2px', color: o.side === 'buy' ? '#3fb950' : '#f85149' }}>{o.side}</td>
+                    <td style={{ padding: '2px' }}>{o.qty}</td>
+                    <td style={{ padding: '2px' }}>{o.limit_price || 'market'}</td>
+                    <td style={{ padding: '2px' }}>{o.status}</td>
                   </tr>
                 ))}
               </tbody>

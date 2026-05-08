@@ -56,7 +56,9 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
               </thead>
               <tbody>
                 {candidates.slice(0, 10).map((c, i) => (
-                  <tr key={i} style={{ borderBottom: '1px solid #21262d' }}>
+                  <tr key={i} style={{ borderBottom: '1px solid #21262d', cursor: 'pointer' }}
+                      onMouseEnter={e => e.currentTarget.style.background = '#1f2a3a'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                     <td style={{ padding: '3px', fontFamily: 'monospace', fontWeight: 'bold', color: '#58a6ff' }}>{c.symbol}</td>
                     <td style={{ padding: '3px' }}>${c.price.toFixed(0)}</td>
                     <td style={{ padding: '3px', color: c.hv > 60 ? '#f0883e' : c.hv > 40 ? '#d29922' : '#3fb950' }}>{c.hv}%</td>
@@ -132,7 +134,9 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
                       {optionsChain.calls.map((c, i) => {
                         const isATM = Math.abs(c.strike - optionsChain.price) < optionsChain.price * 0.01;
                         return (
-                          <tr key={i} style={{ background: isATM ? '#1f3a5f' : 'transparent' }}>
+                          <tr key={i} style={{ background: isATM ? '#1f3a5f' : 'transparent', cursor: 'pointer' }}
+                              onMouseEnter={e => e.currentTarget.style.background = isATM ? '#2a4a6f' : '#1f2a3a'}
+                              onMouseLeave={e => e.currentTarget.style.background = isATM ? '#1f3a5f' : 'transparent'}>
                             <td style={{ padding: '1px', fontFamily: 'monospace', fontWeight: isATM ? 'bold' : 'normal' }}>{c.strike.toFixed(2)}</td>
                             <td style={{ padding: '1px', color: '#3fb950', fontWeight: isATM ? 'bold' : 'normal' }}>{c.price.toFixed(1)}</td>
                             <td style={{ padding: '1px' }}>{c.bid.toFixed(1)}</td>
@@ -160,7 +164,9 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
                       {optionsChain.puts.map((p, i) => {
                         const isATM = Math.abs(p.strike - optionsChain.price) < optionsChain.price * 0.01;
                         return (
-                          <tr key={i} style={{ background: isATM ? '#3d1f1f' : 'transparent' }}>
+                          <tr key={i} style={{ background: isATM ? '#3d1f1f' : 'transparent', cursor: 'pointer' }}
+                              onMouseEnter={e => e.currentTarget.style.background = isATM ? '#4d2f2f' : '#1f2a3a'}
+                              onMouseLeave={e => e.currentTarget.style.background = isATM ? '#3d1f1f' : 'transparent'}>
                             <td style={{ padding: '1px', fontFamily: 'monospace', fontWeight: isATM ? 'bold' : 'normal' }}>{p.strike.toFixed(2)}</td>
                             <td style={{ padding: '1px', color: '#f0883e', fontWeight: isATM ? 'bold' : 'normal' }}>{p.price.toFixed(1)}</td>
                             <td style={{ padding: '1px' }}>{p.bid.toFixed(1)}</td>
