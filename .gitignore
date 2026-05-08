@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Build
+.next/
+dist/
+build/
+
+# Credentials (keep local)
+credentials.json
+
+# Environment
+.env
+.env.local
+
+# OS
+.DS_Store
