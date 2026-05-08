@@ -71,8 +71,6 @@ export default function Dashboard() {
   const handleSelectPrice = (strike: number, type: 'call' | 'put', price: number) => {
     setTradeSymbol(optionsChain ? `${optionsChain.symbol}${type === 'call' ? 'C' : 'P'}${Math.floor(strike)}` : '');
     setTradePrice(price.toString());
-    const expiry = tradeExpiry ? Math.floor(parseFloat(tradeExpiry)) : 34;
-    setTradeSymbol(optionsChain ? `${optionsChain.symbol}${type === 'call' ? 'C' : 'P'}${Math.floor(strike)}${expiry}` : '');
     setActiveTab('research');
   };
 
@@ -86,8 +84,6 @@ export default function Dashboard() {
     const expiry = tradeExpiry ? Math.floor(parseFloat(tradeExpiry)) : 34;
     setTradeSymbol(optionsChain ? `${optionsChain.symbol}${type === 'call' ? 'C' : 'P'}${Math.floor(parseFloat(stockAnalysis?.price || '100'))}${expiry}` : '');
     setTradePrice(price.toString());
-    const expiry = tradeExpiry ? Math.floor(parseFloat(tradeExpiry)) : 34;
-    setTradeSymbol(optionsChain ? `${optionsChain.symbol}${type === 'call' ? 'C' : 'P'}${Math.floor(strike)}${expiry}` : '');
   };
 
   const handleTrade = async (side: string) => {
