@@ -13,7 +13,7 @@ interface TradeProps {
   onTrade?: (side: string) => void;
 }
 
-interface ResearchProps {
+interface ResearchProps & TradeProps {
   onSelectPrice?: (strike: number, type: 'call' | 'put', price: number) => void;
   candidates: Candidate[];
   stockAnalysis: StockAnalysis | null;
@@ -24,7 +24,7 @@ interface ResearchProps {
   analyzing: boolean;
 }
 
-export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze, onAnalyzeStock, onGetOptions, analyzing, onSelectPrice }: ResearchProps) {
+export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze, onAnalyzeStock, onGetOptions, analyzing, onSelectPrice, tradeSymbol, tradePrice, tradeQty, setTradeSymbol, setTradePrice, setTradeQty, onTrade }: ResearchProps & TradeProps) {, optionsChain, onAnalyze, onAnalyzeStock, onGetOptions, analyzing, onSelectPrice }: ResearchProps) {
   const [searchSymbol, setSearchSymbol] = useState('');
 
   return (
@@ -117,6 +117,18 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
             )}
           </div>
         </div>
+          <div style={{ marginTop: '10px', padding: '10px', background: '#161b22', borderRadius: '8px' }}>
+            <h4 style={{ marginTop: 0, marginBottom: '6px', color: '#58a6ff', fontSize: '12px', textAlign: 'center' }}>Quick Trade</h4>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '5px', marginBottom: '5px' }}>
+              <input placeholder='Symbol' value={props.tradeSymbol || ''} onChange={e => props.setTradeSymbol?.(e.target.value)} style={{ padding: '6px', background: '#0d1117', border: '1px solid #21262d', color: '#e6edf3', fontSize: '11px', borderRadius: '4px' }} />
+              <input placeholder='Price' value={props.tradePrice || ''} onChange={e => props.setTradePrice?.(e.target.value)} style={{ padding: '6px', background: '#0d1117', border: '1px solid #21262d', color: '#e6edf3', fontSize: '11px', borderRadius: '4px' }} />
+              <input placeholder='Qty' value={props.tradeQty || '1'} onChange={e => props.setTradeQty?.(e.target.value)} style={{ padding: '6px', background: '#0d1117', border: '1px solid #21262d', color: '#e6edf3', fontSize: '11px', borderRadius: '4px' }} />
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5px' }}>
+              <button onClick={() => props.onTrade?.('buy')} style={{ padding: '8px', background: '#238636', border: 'none', color: 'white', borderRadius: '4px', fontWeight: 'bold', cursor: 'pointer' }}>BUY</button>
+              <button onClick={() => props.onTrade?.('sell')} style={{ padding: '8px', background: '#da3633', border: 'none', color: 'white', borderRadius: '4px', fontWeight: 'bold', cursor: 'pointer' }}>SELL</button>
+            </div>
+          </div>
 
         {/* Right: Options */}
         <div>
