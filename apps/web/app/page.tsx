@@ -23,12 +23,15 @@ interface Order {
   created_at: string;
 }
 
+const TABS = ['positions', 'orders', 'trade', 'research'] as const;
+type Tab = typeof TABS[number];
+
 export default function AlpacaDashboard() {
   const [account, setAccount] = useState<any>(null);
   const [positions, setPositions] = useState<Position[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [clock, setClock] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<'positions' | 'orders' | 'trade'>('positions');
+  const [activeTab, setActiveTab] = useState<Tab>('positions');
   const [tradeSymbol, setTradeSymbol] = useState('AAPL');
   const [tradeQty, setTradeQty] = useState('1');
   const [tradeSide, setTradeSide] = useState('buy');
@@ -91,6 +94,13 @@ export default function AlpacaDashboard() {
   const formatMoney = (v: string) => `$${parseFloat(v || '0').toFixed(2)}`;
   const formatDate = (d: string) => d ? new Date(d).toLocaleString() : '';
 
+  const tabLabels = {
+    positions: '📊 Positions',
+    orders: '📋 Orders',
+    trade: '📝 Trade',
+    research: '📓 Research',
+  };
+
   return (
     <div style={{ minHeight: '100vh', background: '#0d1117', color: '#e6edf3', fontFamily: 'system-ui' }}>
       {/* Header */}
@@ -116,7 +126,7 @@ export default function AlpacaDashboard() {
 
       {/* Tabs */}
       <div style={{ display: 'flex', borderBottom: '1px solid #21262d' }}>
-        {(['positions', 'orders', 'trade'] as const).map(tab => (
+        {TABS.map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -130,7 +140,7 @@ export default function AlpacaDashboard() {
               fontSize: '14px',
             }}
           >
-            {tab === 'positions' ? '📊 Positions' : tab === 'orders' ? '📋 Orders' : '📝 Trade'}
+            {tabLabels[tab]}
           </button>
         ))}
       </div>
@@ -297,6 +307,57 @@ export default function AlpacaDashboard() {
                 {message}
               </div>
             )}
+          </div>
+        )}
+
+        {/* Research Tab */}
+        {activeTab === 'research' && (
+          <div>
+            <h3 style={{ marginTop: 0 }}>📓 Options Research</h3>
+            <p style={{ color: '#8b949e' }}>
+              启动 Jupyter Notebook 进行 Wheel 策略分析
+            </p>
+
+            <div style={{ 
+              padding: '40px', 
+              background: '#161b22', 
+              borderRadius: '12px',
+              textAlign: 'center',
+              maxWidth: '500px',
+            }}>
+              <div style={{ fontSize: '48px', marginBottom: '20px' }}>📓</div>
+              <h4 style={{ margin: '0 0 10px', fontSize: '18px' }}>Jupyter Notebook</h4>
+              <p style={{ color: '#8b949e', marginBottom: '20px' }}>
+                wheel.ipynb - Wheel 策略分析
+              </p>
+              <a
+                href="http://localhost:8888/notebooks/wheel.ipynb"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-block',
+                  padding: '12px 30px',
+                  background: '#238636',
+                  color: 'white',
+                  textDecoration: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: 'bold',
+                }}
+              >
+                🚀 打开 wheel.ipynb
+              </a>
+            </div>
+
+            <div style={{ marginTop: '30px', padding: '15px', background: '#161b22', borderRadius: '8px', maxWidth: '500px' }}>
+              <h4 style={{ margin: '0 0 10px' }}>📋 笔记本说明</h4>
+              <ul style={{ margin: 0, paddingLeft: '20px', color: '#8b949e' }}>
+                <li>账户验证 - 检查 Alpaca 账号状态</li>
+                <li>股票候选池 - 定义要分析的股票</li>
+                <li>历史波动率 - 计算 HV 并分析</li>
+                <li>Wheel 评分 - 筛选最佳候选股票</li>
+              </ul>
+            </div>
           </div>
         )}
       </div>
