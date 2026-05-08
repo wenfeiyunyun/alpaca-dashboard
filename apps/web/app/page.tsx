@@ -71,7 +71,7 @@ export default function Dashboard() {
   const handleSelectPrice = (strike: number, type: 'call' | 'put', price: number) => {
     setTradeSymbol(optionsChain ? `${optionsChain.symbol}${type === 'call' ? 'C' : 'P'}${Math.floor(strike*1000)}` : '');
     setTradePrice(price.toString());
-    setActiveTab('trade');
+    setActiveTab('research');
   };
 
   const handleTrade = async (side: string) => {
