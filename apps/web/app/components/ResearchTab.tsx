@@ -112,6 +112,19 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
               </button>
             </div>
             
+            <div style={{ marginTop: '8px', padding: '8px', background: '#161b22', borderRadius: '6px' }}>
+              <h5 style={{ marginTop: 0, marginBottom: '6px', color: '#58a6ff', fontSize: '11px', textAlign: 'center' }}>Quick Trade</h5>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '4px' }}>
+                <input placeholder='Symbol' value={tradeSymbol || ''} onChange={e => setTradeSymbol?.(e.target.value)} style={{ padding: '5px', background: '#0d1117', border: '1px solid #21262d', color: '#e6edf3', fontSize: '10px', borderRadius: '3px' }} />
+                <input placeholder='Price' value={tradePrice || ''} onChange={e => setTradePrice?.(e.target.value)} style={{ padding: '5px', background: '#0d1117', border: '1px solid #21262d', color: '#e6edf3', fontSize: '10px', borderRadius: '3px' }} />
+                <input placeholder='Qty' value={tradeQty || '1'} onChange={e => setTradeQty?.(e.target.value)} style={{ padding: '5px', background: '#0d1117', border: '1px solid #21262d', color: '#e6edf3', fontSize: '10px', borderRadius: '3px' }} />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px', marginTop: '4px' }}>
+                <button onClick={() => onTrade?.('buy')} style={{ padding: '6px', background: '#238636', border: 'none', color: 'white', borderRadius: '3px', fontSize: '10px', fontWeight: 'bold', cursor: 'pointer' }}>BUY</button>
+                <button onClick={() => onTrade?.('sell')} style={{ padding: '6px', background: '#da3633', border: 'none', color: 'white', borderRadius: '3px', fontSize: '10px', fontWeight: 'bold', cursor: 'pointer' }}>SELL</button>
+              </div>
+            </div>
+            
             {stockAnalysis && (
               <div style={{ marginTop: '8px', padding: '8px', background: '#0d1117', borderRadius: '4px', fontSize: '12px', textAlign: 'center' }}>
                 <div style={{ color: '#8b949e' }}>
