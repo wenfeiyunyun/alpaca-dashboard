@@ -4,6 +4,7 @@ import { Candidate, StockAnalysis, OptionsChain } from '../types';
 import React, { useState } from 'react';
 
 interface ResearchProps {
+  onSelectPrice?: (strike: number, type: 'call' | 'put', price: number) => void;
   candidates: Candidate[];
   stockAnalysis: StockAnalysis | null;
   optionsChain: OptionsChain | null;
@@ -13,7 +14,7 @@ interface ResearchProps {
   analyzing: boolean;
 }
 
-export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze, onAnalyzeStock, onGetOptions, analyzing }: ResearchProps) {
+export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze, onAnalyzeStock, onGetOptions, analyzing, onSelectPrice }: ResearchProps) {
   const [searchSymbol, setSearchSymbol] = useState('');
 
   return (
@@ -134,7 +135,7 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
                         return (
                           <tr key={i} style={{ background: isATM ? '#1f3a5f' : 'transparent' }}>
                             <td style={{ padding: '1px', fontFamily: 'monospace', fontWeight: isATM ? 'bold' : 'normal' }}>{c.strike.toFixed(2)}</td>
-                            <td style={{ padding: '1px', color: '#3fb950', fontWeight: isATM ? 'bold' : 'normal' }}>{c.price.toFixed(1)}</td>
+                            <td style={{ padding: '1px', color: '#3fb950', fontWeight: isATM ? 'bold' : 'normal', cursor: 'pointer' }} onClick={() => onSelectPrice && onSelectPrice(c.strike, 'call', c.price)}>{c.price.toFixed(1)}</td>
                             <td style={{ padding: '1px' }}>{c.bid.toFixed(1)}</td>
                             <td style={{ padding: '1px' }}>{c.ask.toFixed(1)}</td>
                           </tr>
@@ -162,7 +163,7 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
                         return (
                           <tr key={i} style={{ background: isATM ? '#3d1f1f' : 'transparent' }}>
                             <td style={{ padding: '1px', fontFamily: 'monospace', fontWeight: isATM ? 'bold' : 'normal' }}>{p.strike.toFixed(2)}</td>
-                            <td style={{ padding: '1px', color: '#f0883e', fontWeight: isATM ? 'bold' : 'normal' }}>{p.price.toFixed(1)}</td>
+                            <td style={{ padding: '1px', color: '#f0883e', fontWeight: isATM ? 'bold' : 'normal', cursor: 'pointer' }} onClick={() => onSelectPrice && onSelectPrice(p.strike, 'put', p.price)}>{p.price.toFixed(1)}</td>
                             <td style={{ padding: '1px' }}>{p.bid.toFixed(1)}</td>
                             <td style={{ padding: '1px' }}>{p.ask.toFixed(1)}</td>
                           </tr>

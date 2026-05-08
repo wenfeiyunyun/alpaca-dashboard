@@ -109,9 +109,13 @@ interface TradeProps {
   onSubmit: (data: any) => void;
   loading: boolean;
   message: string;
+  symbol?: string;
+  price?: string;
 }
 
-export function TradeTab({ onSubmit, loading, message }: TradeProps) {
+export function TradeTab({ onSubmit, loading, message, symbol, price }: TradeProps) {
+  const [sym, setSym] = useState(symbol || 'AAPL');
+  const [prc, setPrc] = useState(price || '');
   const [symbol, setSymbol] = React.useState('AAPL');
   const [qty, setQty] = React.useState('1');
   const [side, setSide] = React.useState('buy');

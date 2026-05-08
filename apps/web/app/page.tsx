@@ -15,6 +15,8 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<Tab>('holdings');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [tradeSymbol, setTradeSymbol] = useState('AAPL');
+  const [tradePrice, setTradePrice] = useState('');
   
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [stockAnalysis, setStockAnalysis] = useState<StockAnalysis | null>(null);
@@ -66,6 +68,12 @@ export default function Dashboard() {
       if (!data.error) setOptionsChain(data);
     } catch (e) { console.error(e); }
     setAnalyzing(false);
+  };
+
+  const handleSelectPrice = (strike: number, type: 'call' | 'put', price: number) => {
+    setTradeSymbol(optionsChain ? `${optionsChain.symbol}${type === 'call' ? 'C' : 'P'}${Math.floor(strike*1000)}` : '');
+    setTradePrice(price.toString());
+    setActiveTab('trade');
   };
 
   const handleOrder = async (order: any) => {
@@ -131,7 +139,7 @@ export default function Dashboard() {
 
       <div style={{ padding: '15px' }}>
         {activeTab === 'holdings' && <UnifiedPositionsOrdersTab positions={positions} orders={orders} />}
-        {activeTab === 'trade' && <TradeTab onSubmit={handleOrder} loading={loading} message={message} />}
+        {activeTab === 'trade' && <TradeTab onSubmit={handleOrder} loading={loading} message={message} symbol={tradeSymbol} price={tradePrice} />}
         {activeTab === 'research' && (
           <ResearchTab
             candidates={candidates}
@@ -141,6 +149,7 @@ export default function Dashboard() {
             onAnalyzeStock={analyzeStock}
             onGetOptions={getOptions}
             analyzing={analyzing}
+            onSelectPrice={handleSelectPrice}
           />
         )}
       </div>
