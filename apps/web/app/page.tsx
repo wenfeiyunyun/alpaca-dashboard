@@ -1,10 +1,10 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { PositionsTab, OrdersTab, TradeTab } from './components/Tabs';
+import { UnifiedPositionsOrdersTab, TradeTab } from './components/Tabs';
 import { ResearchTab } from './components/ResearchTab';
 import type { Candidate, StockAnalysis, OptionsChain } from './types';
 
-const TABS = ['positions', 'orders', 'trade', 'research'] as const;
+const TABS = ['holdings', 'trade', 'research'] as const;
 type Tab = typeof TABS[number];
 
 export default function Dashboard() {
@@ -12,7 +12,7 @@ export default function Dashboard() {
   const [positions, setPositions] = useState<any[]>([]);
   const [orders, setOrders] = useState<any[]>([]);
   const [clock, setClock] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<Tab>('positions');
+  const [activeTab, setActiveTab] = useState<Tab>('holdings');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   
@@ -79,12 +79,12 @@ export default function Dashboard() {
       });
       const data = await res.json();
       if (res.ok) {
-        setMessage(`✅ ${data.symbol} ${data.side} ${data.qty} @ ${data.limit_price || 'market'}`);
+        setMessage(`Done: ${data.symbol} ${data.side} ${data.qty}`);
         fetchData();
       } else {
-        setMessage(`❌ ${data.message || JSON.stringify(data)}`);
+        setMessage(`Error: ${data.message}`);
       }
-    } catch (e: any) { setMessage(`❌ ${e.message}`); }
+    } catch (e: any) { setMessage(`Error: ${e.message}`); }
     setLoading(false);
   };
 
@@ -95,43 +95,42 @@ export default function Dashboard() {
   }, []);
 
   const formatMoney = (v: string) => `$${parseFloat(v || '0').toFixed(2)}`;
-  const tabLabels = { positions: '📊 Positions', orders: '📋 Orders', trade: '📝 Trade', research: '📓 Research' };
+  const tabLabels = { holdings: 'Holdings', trade: 'Trade', research: 'Research' };
 
   return (
     <div style={{ minHeight: '100vh', background: '#0d1117', color: '#e6edf3', fontFamily: 'system-ui' }}>
-      <header style={{ padding: '20px', borderBottom: '1px solid #21262d', display: 'flex', justifyContent: 'space-between' }}>
-        <h1 style={{ margin: 0, fontSize: '24px', color: '#58a6ff' }}>🐉 Alpaca Dashboard</h1>
+      <header style={{ padding: '15px', borderBottom: '1px solid #21262d', display: 'flex', justifyContent: 'space-between' }}>
+        <h1 style={{ margin: 0, fontSize: '20px', color: '#58a6ff' }}>Alpaca Dashboard</h1>
         <div style={{ textAlign: 'right' }}>
-          <div style={{ fontSize: '12px', color: '#8b949e' }}>Portfolio</div>
-          <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#3fb950' }}>{account ? formatMoney(account.portfolio_value) : '...'}</div>
-          <div style={{ fontSize: '14px', color: '#8b949e' }}>Cash: {account ? formatMoney(account.cash) : '...'}</div>
+          <div style={{ fontSize: '11px', color: '#8b949e' }}>Portfolio</div>
+          <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#3fb950' }}>{account ? formatMoney(account.portfolio_value) : '...'}</div>
+          <div style={{ fontSize: '12px', color: '#8b949e' }}>Cash: {account ? formatMoney(account.cash) : '...'}</div>
         </div>
       </header>
 
-      <div style={{ padding: '10px 20px', background: '#161b22', fontSize: '12px', color: '#8b949e' }}>
-        <span>📈 {clock?.is_open ? '🟢 OPEN' : '🔴 CLOSED'}</span>
-        <span style={{ marginLeft: '20px' }}>💰 {account ? formatMoney(account.buying_power) : '...'}</span>
+      <div style={{ padding: '8px 15px', background: '#161b22', fontSize: '11px', color: '#8b949e' }}>
+        <span>Market: {clock?.is_open ? 'Open' : 'Closed'}</span>
+        <span style={{ marginLeft: '15px' }}>Power: {account ? formatMoney(account.buying_power) : '...'}</span>
       </div>
 
       <div style={{ display: 'flex', borderBottom: '1px solid #21262d' }}>
         {TABS.map(tab => (
           <button key={tab} onClick={() => setActiveTab(tab)}
             style={{
-              padding: '15px 30px',
+              padding: '12px 24px',
               background: activeTab === tab ? '#161b22' : 'transparent',
               border: 'none',
               color: activeTab === tab ? '#58a6ff' : '#8b949e',
               borderBottom: activeTab === tab ? '2px solid #58a6ff' : '2px solid transparent',
-              cursor: 'pointer', fontSize: '14px',
+              cursor: 'pointer', fontSize: '12px',
             }}>
             {tabLabels[tab]}
           </button>
         ))}
       </div>
 
-      <div style={{ padding: '20px' }}>
-        {activeTab === 'positions' && <PositionsTab positions={positions} />}
-        {activeTab === 'orders' && <OrdersTab orders={orders} />}
+      <div style={{ padding: '15px' }}>
+        {activeTab === 'holdings' && <UnifiedPositionsOrdersTab positions={positions} orders={orders} />}
         {activeTab === 'trade' && <TradeTab onSubmit={handleOrder} loading={loading} message={message} />}
         {activeTab === 'research' && (
           <ResearchTab
