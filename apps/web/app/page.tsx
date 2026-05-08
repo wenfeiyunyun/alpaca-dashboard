@@ -69,18 +69,18 @@ export default function Dashboard() {
   };
 
   const handleSelectPrice = (strike: number, type: 'call' | 'put', price: number) => {
-    setTradeSymbol(optionsChain ? `${optionsChain.symbol}${type === 'call' ? 'C' : 'P'}${Math.floor(strike*1000)}` : '');
+    setTradeSymbol(optionsChain ? `${optionsChain.symbol}${type === 'call' ? 'C' : 'P'}${Math.floor(strike)}` : '');
     setTradePrice(price.toString());
     setActiveTab('research');
   };
 
   const handleSelectStrike = (strike: number, type: 'call' | 'put') => {
-    setTradeSymbol(optionsChain ? `${optionsChain.symbol}${type === 'call' ? 'C' : 'P'}${Math.floor(strike*1000)}` : '');
+    setTradeSymbol(optionsChain ? `${optionsChain.symbol}${type === 'call' ? 'C' : 'P'}${Math.floor(strike)}` : '');
     setTradePrice('');
   };
 
   const handleSelectBidAsk = (price: number, type: 'call' | 'put', ba: 'bid' | 'ask') => {
-    setTradeSymbol(optionsChain ? `${optionsChain.symbol}${type === 'call' ? 'C' : 'P'}${Math.floor(parseFloat(stockAnalysis?.price || '100')*1000)}` : '');
+    setTradeSymbol(optionsChain ? `${optionsChain.symbol}${type === 'call' ? 'C' : 'P'}${Math.floor(parseFloat(stockAnalysis?.price || '100'))}` : '');
     setTradePrice(price.toString());
   };
 
