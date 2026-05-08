@@ -18,9 +18,9 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
 
   return (
     <div style={{ padding: '20px' }}>
-      <h3 style={{ marginTop: 0, color: '#58a6ff', marginBottom: '15px', fontSize: '18px', textAlign: 'center' }}>Wheel Strategy Research</h3>
-      
-      <div style={{ marginBottom: '15px', textAlign: 'center' }}>
+      {/* Title and Button - Left Aligned */}
+      <div style={{ marginBottom: '15px', textAlign: 'left' }}>
+        <span style={{ color: '#58a6ff', fontSize: '18px', fontWeight: 'bold', marginRight: '15px' }}>Wheel Strategy Research</span>
         <button
           onClick={onAnalyze}
           disabled={analyzing}
@@ -166,7 +166,7 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
                         return (
                           <tr key={i} style={{ background: isATM ? '#3d1f1f' : 'transparent', cursor: 'pointer' }}
                               onMouseEnter={e => e.currentTarget.style.background = isATM ? '#4d2f2f' : '#1f2a3a'}
-                              onMouseLeave={e => e.currentTarget.style.background = isATM ? '#3d1f1f' : 'transparent'}>
+                              onMouseLeave={e => e.currentTarget.style.background = isATM ? '#3d1f1f' : 'transparent' }}>
                             <td style={{ padding: '1px', fontFamily: 'monospace', fontWeight: isATM ? 'bold' : 'normal' }}>{p.strike.toFixed(2)}</td>
                             <td style={{ padding: '1px', color: '#f0883e', fontWeight: isATM ? 'bold' : 'normal' }}>{p.price.toFixed(1)}</td>
                             <td style={{ padding: '1px' }}>{p.bid.toFixed(1)}</td>
