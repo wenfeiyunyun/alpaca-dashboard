@@ -119,7 +119,6 @@ export function TradeTab({ onSubmit, loading, message, symbol, price }: TradePro
   const [qty, setQty] = React.useState('1');
   const [side, setSide] = React.useState('buy');
   const [type, setType] = React.useState('market');
-  const [type, setType] = React.useState('market');
 
   return (
     <div style={{ maxWidth: '400px' }}>
