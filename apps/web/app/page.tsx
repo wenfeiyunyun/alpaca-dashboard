@@ -15,11 +15,6 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<Tab>('holdings');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
-  const [tradeSymbol, setTradeSymbol] = useState('');
-  const [tradePrice, setTradePrice] = useState('');
-  const [tradeQty, setTradeQty] = useState('1');
-  const [tradeSymbol, setTradeSymbol] = useState('AAPL');
-  const [tradePrice, setTradePrice] = useState('');
   
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [stockAnalysis, setStockAnalysis] = useState<StockAnalysis | null>(null);
