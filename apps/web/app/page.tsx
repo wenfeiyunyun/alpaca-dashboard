@@ -1,7 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { PositionsTab, OrdersTab, TradeTab, ResearchTab } from './components/Tabs';
-import type { Candidate, StockAnalysis } from './types';
+import { PositionsTab, OrdersTab, TradeTab } from './components/Tabs';
+import { ResearchTab } from './components/ResearchTab';
+import type { Candidate, StockAnalysis, OptionsChain } from './types';
 
 const TABS = ['positions', 'orders', 'trade', 'research'] as const;
 type Tab = typeof TABS[number];
@@ -14,8 +15,10 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<Tab>('positions');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [stockAnalysis, setStockAnalysis] = useState<StockAnalysis | null>(null);
+  const [optionsChain, setOptionsChain] = useState<OptionsChain | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
 
   const fetchData = async () => {
@@ -49,8 +52,18 @@ export default function Dashboard() {
     try {
       const res = await fetch(`/api/research?endpoint=stock&symbol=${symbol.trim()}`);
       const data = await res.json();
-      if (data.error) alert(data.error);
-      else setStockAnalysis(data);
+      if (!data.error) setStockAnalysis(data);
+    } catch (e) { console.error(e); }
+    setAnalyzing(false);
+  };
+
+  const getOptions = async (symbol: string) => {
+    if (!symbol.trim()) return;
+    setAnalyzing(true);
+    try {
+      const res = await fetch(`/api/research?endpoint=options&symbol=${symbol.trim()}`);
+      const data = await res.json();
+      if (!data.error) setOptionsChain(data);
     } catch (e) { console.error(e); }
     setAnalyzing(false);
   };
@@ -124,8 +137,10 @@ export default function Dashboard() {
           <ResearchTab
             candidates={candidates}
             stockAnalysis={stockAnalysis}
+            optionsChain={optionsChain}
             onAnalyze={analyzeCandidates}
             onAnalyzeStock={analyzeStock}
+            onGetOptions={getOptions}
             analyzing={analyzing}
           />
         )}

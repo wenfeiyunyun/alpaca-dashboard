@@ -18,3 +18,21 @@ export interface StockAnalysis {
     callOTM10: number;
   };
 }
+
+export interface Option {
+  strike: number;
+  price: number;
+  bid: number;
+  ask: number;
+  iv: number;
+}
+
+export interface OptionsChain {
+  symbol: string;
+  price: number;
+  hv: number;
+  expirations: string[];
+  strikes: number[];
+  calls: Option[];
+  puts: Option[];
+}
