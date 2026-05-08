@@ -18,9 +18,7 @@ async function getYahooPrice(symbol: string): Promise<number> {
     );
     const data = await res.json();
     return data?.chart?.result?.[0]?.meta?.regularMarketPrice || 0;
-  } catch {
-    return 0;
-  }
+  } catch { return 0; }
 }
 
 async function getYahooHV(symbol: string): Promise<number> {
@@ -41,13 +39,11 @@ async function getYahooHV(symbol: string): Promise<number> {
     const mean = recent.reduce((a, b) => a + b, 0) / recent.length;
     const variance = recent.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / recent.length;
     return Math.round(Math.sqrt(variance) * Math.sqrt(252) * 1000) / 10;
-  } catch {
-    return 0;
-  }
+  } catch { return 0; }
 }
 
-// 修复后的期权定价 - 更准确的估算
-function estimateOptionPrice(
+// 平滑的期权定价公式
+function calcOptionPrice(
   stockPrice: number,
   strikePrice: number,
   daysToExpiry: number,
@@ -56,37 +52,30 @@ function estimateOptionPrice(
 ): number {
   const t = daysToExpiry / 365;
   const v = volatility / 100;
-  const priceRatio = stockPrice / strikePrice;
+  const s = stockPrice;
+  const k = strikePrice;
   
   // 内在价值
-  const intrinsic = isCall
-    ? Math.max(0, stockPrice - strikePrice)
-    : Math.max(0, strikePrice - stockPrice);
+  const intrinsic = isCall ? Math.max(0, s - k) : Math.max(0, k - s);
   
-  // 时间价值 - 基于 Moneyness 调整
-  let moneynessFactor = 1;
-  if (isCall) {
-    if (priceRatio < 0.8) moneynessFactor = 0.1; // deep ITM
-    else if (priceRatio < 0.9) moneynessFactor = 0.5;
-    else if (priceRatio > 1.2) moneynessFactor = 0.1; // deep OTM
-    else if (priceRatio > 1.1) moneynessFactor = 0.5;
-  } else {
-    if (priceRatio > 1.2) moneynessFactor = 0.1;
-    else if (priceRatio > 1.1) moneynessFactor = 0.5;
-    if (priceRatio < 0.8) moneynessFactor = 0.1;
-    else if (priceRatio < 0.9) moneynessFactor = 0.5;
-  }
+  // 时间价值 - 高斯曲线形状
+  const logMoneyness = Math.log(s / k);
+  const sigma = v * Math.sqrt(t);
   
-  const timeValue = stockPrice * v * Math.sqrt(t) * 0.3 * moneynessFactor;
-  const extrinsic = Math.max(0, timeValue);
+  // 标准差距离
+  const stdDistance = Math.abs(logMoneyness) / sigma;
   
-  return Math.round((intrinsic + extrinsic) * 100) / 100;
+  // 时间价值在高斯分布中心最大
+  const maxTimeValue = s * sigma * 0.5;
+  const timeValue = maxTimeValue * Math.exp(-stdDistance * stdDistance * 0.5);
+  
+  const price = intrinsic + Math.max(0.03, timeValue);
+  return Math.round(price * 100) / 100;
 }
 
 function generateOptionsChain(symbol: string, price: number, hv: number) {
-  // 20 below + ATM + 20 above = 41 strikes
   const strikes: number[] = [];
-  const step = price * 0.02;
+  const step = price * 0.015;
   
   for (let i = 20; i >= 1; i--) {
     strikes.push(Math.round((price - i * step) * 100) / 100);
@@ -101,29 +90,19 @@ function generateOptionsChain(symbol: string, price: number, hv: number) {
   const puts = [];
   
   for (const s of strikes) {
-    calls.push({
-      strike: s,
-      price: estimateOptionPrice(price, s, days, hv, true),
-      bid: 0,
-      ask: 0,
-      iv: hv,
-    });
-    puts.push({
-      strike: s,
-      price: estimateOptionPrice(price, s, days, hv, false),
-      bid: 0,
-      ask: 0,
-      iv: hv,
-    });
+    const callPrice = calcOptionPrice(price, s, days, hv, true);
+    const bid = Math.round(Math.max(0.01, callPrice * 0.85) * 100) / 100;
+    const ask = Math.round(callPrice * 1.15 * 100) / 100;
+    
+    const putPrice = calcOptionPrice(price, s, days, hv, false);
+    const putBid = Math.round(Math.max(0.01, putPrice * 0.85) * 100) / 100;
+    const putAsk = Math.round(putPrice * 1.15 * 100) / 100;
+    
+    calls.push({ strike: s, price: callPrice, bid, ask, iv: hv });
+    puts.push({ strike: s, price: putPrice, bid: putBid, ask: putAsk, iv: hv });
   }
   
-  return {
-    symbol,
-    price,
-    hv,
-    calls,
-    puts,
-  };
+  return { symbol, price, hv, calls, puts };
 }
 
 export async function GET(request: Request) {
