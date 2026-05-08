@@ -20,7 +20,6 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
     <div style={{ padding: '20px' }}>
       <h3 style={{ marginTop: 0, color: '#58a6ff', marginBottom: '20px' }}>📓 Wheel Strategy Research</h3>
       
-      {/* 分析按钮 */}
       <div style={{ marginBottom: '20px' }}>
         <button
           onClick={onAnalyze}
@@ -41,9 +40,7 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
         </button>
       </div>
 
-      {/* 主体：左右并排 */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-        
         {/* 左边：推荐表 */}
         <div>
           <div style={{ padding: '15px', background: '#161b22', borderRadius: '12px' }}>
@@ -92,7 +89,6 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
             )}
           </div>
           
-          {/* 个股分析输入 */}
           <div style={{ marginTop: '15px', padding: '15px', background: '#161b22', borderRadius: '12px' }}>
             <h4 style={{ marginTop: 0, marginBottom: '10px', fontSize: '14px' }}>🔎 个股分析</h4>
             <div style={{ display: 'flex', gap: '8px' }}>
@@ -138,7 +134,6 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
             )}
           </div>
           
-          {/* 说明 */}
           <div style={{ marginTop: '15px', padding: '12px', background: '#161b22', borderRadius: '8px' }}>
             <h5 style={{ marginTop: 0, marginBottom: '8px', fontSize: '12px', color: '#8b949e' }}>📋 评分说明</h5>
             <ul style={{ margin: 0, paddingLeft: '18px', color: '#8b949e', fontSize: '11px' }}>
@@ -149,66 +144,82 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
           </div>
         </div>
 
-        {/* 右边：Options 链 */}
+        {/* 右边：Options 链 - 41个价格 */}
         <div>
           {optionsChain && (
             <div style={{ padding: '15px', background: '#161b22', borderRadius: '12px' }}>
-              <h4 style={{ marginTop: 0, marginBottom: '10px', color: '#58a6ff', fontSize: '16px' }}>
-                📊 {optionsChain.symbol} Options
-                <span style={{ fontSize: '13px', color: '#8b949e', marginLeft: '10px' }}>
+              <h4 style={{ marginTop: 0, marginBottom: '10px', color: '#58a6ff', fontSize: '14px' }}>
+                📊 {optionsChain.symbol} Options ({optionsChain.calls.length} 个)
+                <span style={{ fontSize: '12px', color: '#8b949e', marginLeft: '10px' }}>
                   ${optionsChain.price.toFixed(2)} | HV: {optionsChain.hv}%
                 </span>
               </h4>
               
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-                {/* Calls */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                {/* Calls - 显示所有41个 */}
                 <div>
-                  <h5 style={{ color: '#3fb950', marginBottom: '8px', fontSize: '13px' }}>📈 Calls</h5>
-                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                    <thead>
-                      <tr style={{ borderBottom: '1px solid #21262d' }}>
-                        <th style={{ padding: '4px', color: '#8b949e', fontSize: '11px' }}>Str</th>
-                        <th style={{ padding: '4px', color: '#8b949e', fontSize: '11px' }}>Price</th>
-                        <th style={{ padding: '4px', color: '#8b949e', fontSize: '11px' }}>Bid</th>
-                        <th style={{ padding: '4px', color: '#8b949e', fontSize: '11px' }}>Ask</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {optionsChain.calls.slice(0, 6).map((c, i) => (
-                        <tr key={i} style={{ borderBottom: '1px solid #21262d' }}>
-                          <td style={{ padding: '4px', fontFamily: 'monospace', fontSize: '12px' }}>${c.strike}</td>
-                          <td style={{ padding: '4px', color: '#3fb950', fontWeight: 'bold', fontSize: '12px' }}>${c.price}</td>
-                          <td style={{ padding: '4px', fontSize: '12px' }}>${c.bid}</td>
-                          <td style={{ padding: '4px', fontSize: '12px' }}>${c.ask}</td>
+                  <h5 style={{ color: '#3fb950', marginBottom: '6px', fontSize: '12px' }}>📈 Calls</h5>
+                  <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+                      <thead>
+                        <tr style={{ borderBottom: '1px solid #21262d', position: 'sticky', top: 0, background: '#161b22' }}>
+                          <th style={{ padding: '3px', color: '#8b949e' }}>Str</th>
+                          <th style={{ padding: '3px', color: '#8b949e' }}>Price</th>
+                          <th style={{ padding: '3px', color: '#8b949e' }}>Bid</th>
+                          <th style={{ padding: '3px', color: '#8b949e' }}>Ask</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {optionsChain.calls.map((c, i) => {
+                          const isATM = Math.abs(c.strike - optionsChain.price) < optionsChain.price * 0.02;
+                          return (
+                            <tr key={i} style={{ 
+                              borderBottom: '1px solid #21262d',
+                              background: isATM ? '#1f3a5f' : 'transparent'
+                            }}>
+                              <td style={{ padding: '3px', fontFamily: 'monospace', fontWeight: isATM ? 'bold' : 'normal' }}>${c.strike}</td>
+                              <td style={{ padding: '3px', color: '#3fb950', fontWeight: isATM ? 'bold' : 'normal' }}>${c.price}</td>
+                              <td style={{ padding: '3px' }}>${c.bid}</td>
+                              <td style={{ padding: '3px' }}>${c.ask}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
                 
-                {/* Puts */}
+                {/* Puts - 显示所有41个 */}
                 <div>
-                  <h5 style={{ color: '#f0883e', marginBottom: '8px', fontSize: '13px' }}>📉 Puts</h5>
-                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                    <thead>
-                      <tr style={{ borderBottom: '1px solid #21262d' }}>
-                        <th style={{ padding: '4px', color: '#8b949e', fontSize: '11px' }}>Str</th>
-                        <th style={{ padding: '4px', color: '#8b949e', fontSize: '11px' }}>Price</th>
-                        <th style={{ padding: '4px', color: '#8b949e', fontSize: '11px' }}>Bid</th>
-                        <th style={{ padding: '4px', color: '#8b949e', fontSize: '11px' }}>Ask</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {optionsChain.puts.slice(0, 6).map((p, i) => (
-                        <tr key={i} style={{ borderBottom: '1px solid #21262d' }}>
-                          <td style={{ padding: '4px', fontFamily: 'monospace', fontSize: '12px' }}>${p.strike}</td>
-                          <td style={{ padding: '4px', color: '#f0883e', fontWeight: 'bold', fontSize: '12px' }}>${p.price}</td>
-                          <td style={{ padding: '4px', fontSize: '12px' }}>${p.bid}</td>
-                          <td style={{ padding: '4px', fontSize: '12px' }}>${p.ask}</td>
+                  <h5 style={{ color: '#f0883e', marginBottom: '6px', fontSize: '12px' }}>📉 Puts</h5>
+                  <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+                      <thead>
+                        <tr style={{ borderBottom: '1px solid #21262d', position: 'sticky', top: 0, background: '#161b22' }}>
+                          <th style={{ padding: '3px', color: '#8b949e' }}>Str</th>
+                          <th style={{ padding: '3px', color: '#8b949e' }}>Price</th>
+                          <th style={{ padding: '3px', color: '#8b949e' }}>Bid</th>
+                          <th style={{ padding: '3px', color: '#8b949e' }}>Ask</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {optionsChain.puts.map((p, i) => {
+                          const isATM = Math.abs(p.strike - optionsChain.price) < optionsChain.price * 0.02;
+                          return (
+                            <tr key={i} style={{ 
+                              borderBottom: '1px solid #21262d',
+                              background: isATM ? '#3d1f1f' : 'transparent'
+                            }}>
+                              <td style={{ padding: '3px', fontFamily: 'monospace', fontWeight: isATM ? 'bold' : 'normal' }}>${p.strike}</td>
+                              <td style={{ padding: '3px', color: '#f0883e', fontWeight: isATM ? 'bold' : 'normal' }}>${p.price}</td>
+                              <td style={{ padding: '3px' }}>${p.bid}</td>
+                              <td style={{ padding: '3px' }}>${p.ask}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>
@@ -216,7 +227,8 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
           
           {!optionsChain && (
             <div style={{ padding: '40px', background: '#161b22', borderRadius: '12px', textAlign: 'center', color: '#8b949e' }}>
-              <p>点击左侧股票的 "Options" 按钮查看期权价格</p>
+              <p>点击左侧股票的 "Options" 查看41个价格</p>
+              <p style={{ fontSize: '12px' }}>(当前价 ± 20档)</p>
             </div>
           )}
         </div>

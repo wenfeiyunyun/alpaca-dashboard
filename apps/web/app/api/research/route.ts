@@ -51,8 +51,7 @@ async function getYahooHV(symbol: string): Promise<number> {
   }
 }
 
-// 简化期权定价估算 (基于内在价值 + 时间价值)
-// 注意: 这是估算，实际价格需要 broker API
+// 估算期权价格
 function estimateOptionPrice(
   stockPrice: number,
   strikePrice: number,
@@ -60,7 +59,6 @@ function estimateOptionPrice(
   volatility: number,
   isCall: boolean
 ): number {
-  const r = 0.05; // 假设无风险利率 5%
   const t = daysToExpiry / 365;
   const v = volatility / 100;
   
@@ -68,47 +66,38 @@ function estimateOptionPrice(
     return isCall ? Math.max(0, stockPrice - strikePrice) : Math.max(0, strikePrice - stockPrice);
   }
   
-  // 简化版: 内在价值 + 时间价值估算
   const intrinsic = isCall 
     ? Math.max(0, stockPrice - strikePrice)
     : Math.max(0, strikePrice - stockPrice);
     
-  // 时间价值简化估算
   const timeValue = stockPrice * v * Math.sqrt(t) * 0.4;
   const extrinsic = Math.max(0, timeValue);
   
   return Math.round((intrinsic + extrinsic) * 100) / 100;
 }
 
-// 生成 Options 链
-async function generateOptionsChain(symbol: string) {
-  const price = await getYahooPrice(symbol);
-  const hv = await getYahooHV(symbol);
-  
-  if (!price || !hv) return null;
-  
-  // 到期日 (未来4周)
-  const expirations = [
-    new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    new Date(Date.now() + 21 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-  ];
-  
-  // 生成 10 个行权价 (atm +/- 20%)
+// 生成 Options 链 - 上下各20个
+function generateOptionsChain(symbol: string, price: number, hv: number) {
+  // 生成 20个上方 + 20个下方 + ATM = 41个行权价
   const strikes: number[] = [];
-  const steps = 10;
-  const step = price * 0.05;
-  const center = Math.round(price / step) * step;
-  for (let i = -steps/2; i <= steps/2; i++) {
-    strikes.push(Math.round((center + i * step) * 100) / 100);
+  const step = price * 0.02; // 2% 间隔
+  
+  // 下方 20 个
+  for (let i = 20; i >= 1; i--) {
+    strikes.push(Math.round((price - i * step) * 100) / 100);
+  }
+  // ATM
+  strikes.push(price);
+  // 上方 20 个
+  for (let i = 1; i <= 20; i++) {
+    strikes.push(Math.round((price + i * step) * 100) / 100);
   }
   
+  const days = 30;
   const calls = [];
   const puts = [];
   
   for (const s of strikes) {
-    const days = 30;
     const callPrice = estimateOptionPrice(price, s, days, hv, true);
     const putPrice = estimateOptionPrice(price, s, days, hv, false);
     
@@ -133,7 +122,12 @@ async function generateOptionsChain(symbol: string) {
     symbol,
     price,
     hv,
-    expirations,
+    expirations: [
+      new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      new Date(Date.now() + 21 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    ],
     strikes,
     calls,
     puts,
@@ -156,64 +150,42 @@ export async function GET(request: Request) {
       return NextResponse.json(await resp.json());
     }
 
-    // 分析候选股票池
     if (endpoint === 'analyze') {
-      const prices: Record<string, number> = {};
       const results = [];
-      
       for (const sym of CANDIDATES.slice(0, 30)) {
         const price = await getYahooPrice(sym);
         if (!price) continue;
-        prices[sym] = price;
-        
         const hv = await getYahooHV(sym);
         if (!hv) continue;
-        
         let score = 0;
         score += hv > 60 ? 50 : hv > 40 ? 40 : hv > 30 ? 30 : hv > 20 ? 20 : 10;
         score += price >= 20 && price <= 200 ? 20 : price >= 10 && price <= 500 ? 10 : 5;
-        
         results.push({ symbol: sym, price, hv, score });
       }
-      
       results.sort((a, b) => b.score - a.score);
       return NextResponse.json({ candidates: results.slice(0, 10), total: results.length });
     }
 
-    // 单股分析
     if (endpoint === 'stock' && symbol) {
       const sym = symbol.toUpperCase();
       const price = await getYahooPrice(sym);
       if (!price) return NextResponse.json({ error: '无法获取价格' }, { status: 400 });
-      
       const hv = await getYahooHV(sym);
       let score = 0;
       if (hv) {
         score += hv > 60 ? 50 : hv > 40 ? 40 : hv > 30 ? 30 : hv > 20 ? 20 : 10;
         score += price >= 20 && price <= 200 ? 20 : price >= 10 && price <= 500 ? 10 : 5;
       }
-      
       const rec = hv > 60 ? '⚠️ 高波动' : hv > 40 ? '🟡 中高波动' : hv > 20 ? '🟢 中等波动' : '🔵 低波动';
-      
-      return NextResponse.json({
-        symbol: sym,
-        price,
-        hv,
-        score,
-        recommendation: rec,
-        options: {
-          putOTM5: Math.round(price * 0.95 * 100) / 100,
-          putOTM10: Math.round(price * 0.90 * 100) / 100,
-          callOTM5: Math.round(price * 1.05 * 100) / 100,
-          callOTM10: Math.round(price * 1.10 * 100) / 100,
-        },
-      });
+      return NextResponse.json({ symbol: sym, price, hv, score, recommendation: rec });
     }
 
-    // Options 链
     if (endpoint === 'options' && symbol) {
-      const chain = await generateOptionsChain(symbol.toUpperCase());
-      if (!chain) return NextResponse.json({ error: '无法获取数据' }, { status: 400 });
+      const sym = symbol.toUpperCase();
+      const price = await getYahooPrice(sym);
+      const hv = await getYahooHV(sym);
+      if (!price) return NextResponse.json({ error: '无法获取数据' }, { status: 400 });
+      const chain = generateOptionsChain(sym, price, hv);
       return NextResponse.json(chain);
     }
 
