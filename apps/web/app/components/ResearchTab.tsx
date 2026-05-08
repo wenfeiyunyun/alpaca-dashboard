@@ -18,7 +18,7 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
 
   return (
     <div style={{ padding: '20px' }}>
-      <h3 style={{ marginTop: 0, color: '#58a6ff', marginBottom: '15px', fontSize: '18px' }}>📓 Wheel Strategy Research</h3>
+      <h3 style={{ marginTop: 0, color: '#58a6ff', marginBottom: '15px', fontSize: '18px' }}>Wheel Strategy Research</h3>
       
       <div style={{ marginBottom: '15px' }}>
         <button
@@ -35,15 +35,15 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
             cursor: analyzing ? 'not-allowed' : 'pointer',
           }}
         >
-          {analyzing ? '⏳ Analyzing...' : '🔍 分析候选股票池'}
+          {analyzing ? 'Analyzing...' : 'Analyze Candidates'}
         </button>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: '12px' }}>
-        {/* 左边：推荐表 */}
+        {/* Left: Candidates */}
         <div>
           <div style={{ padding: '10px', background: '#161b22', borderRadius: '8px' }}>
-            <h4 style={{ marginTop: 0, marginBottom: '6px', color: '#d29922', fontSize: '12px' }}>🏆 TOP 10 推荐</h4>
+            <h4 style={{ marginTop: 0, marginBottom: '6px', color: '#d29922', fontSize: '12px' }}>TOP 10 Candidates</h4>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid #21262d' }}>
@@ -66,7 +66,7 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
                         onClick={() => onGetOptions(c.symbol)}
                         style={{ padding: '2px 5px', background: '#1f6feb', border: 'none', color: 'white', borderRadius: '3px', fontSize: '9px', cursor: 'pointer' }}
                       >
-                        期权
+                        Options
                       </button>
                     </td>
                   </tr>
@@ -76,10 +76,10 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
           </div>
           
           <div style={{ marginTop: '10px', padding: '10px', background: '#161b22', borderRadius: '8px' }}>
-            <h4 style={{ marginTop: 0, marginBottom: '6px', fontSize: '12px' }}>🔎 个股分析</h4>
+            <h4 style={{ marginTop: 0, marginBottom: '6px', fontSize: '12px' }}>Stock Analysis</h4>
             <div style={{ display: 'flex', gap: '5px' }}>
               <input
-                placeholder="股票代码..."
+                placeholder="Symbol..."
                 value={searchSymbol}
                 onChange={e => setSearchSymbol(e.target.value.toUpperCase())}
                 style={{ flex: 1, padding: '6px', background: '#0d1117', border: '1px solid #21262d', color: '#e6edf3', fontSize: '11px', borderRadius: '4px' }}
@@ -89,29 +89,42 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
                 disabled={analyzing || !searchSymbol.trim()}
                 style={{ padding: '6px 10px', background: '#1f6feb', border: 'none', color: 'white', borderRadius: '4px', fontSize: '11px', cursor: 'pointer' }}
               >
-                分析
+                Go
               </button>
             </div>
+            
+            {/* Show stock score */}
+            {stockAnalysis && (
+              <div style={{ marginTop: '8px', padding: '8px', background: '#0d1117', borderRadius: '4px', fontSize: '12px' }}>
+                <div style={{ color: '#8b949e' }}>
+                  Score: <strong style={{ color: '#58a6ff', fontSize: '16px' }}>{stockAnalysis.score}/100</strong>
+                  <span style={{ marginLeft: '8px' }}>{stockAnalysis.recommendation}</span>
+                </div>
+                <div style={{ marginTop: '4px', color: '#8b949e', fontSize: '10px' }}>
+                  Price: ${stockAnalysis.price} | HV: {stockAnalysis.hv}%
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* 右边：Options 链 */}
+        {/* Right: Options */}
         <div>
           {optionsChain && (
             <div style={{ padding: '10px', background: '#161b22', borderRadius: '8px' }}>
               <h4 style={{ marginTop: 0, marginBottom: '6px', color: '#58a6ff', fontSize: '12px' }}>
-                📊 {optionsChain.symbol} {optionsChain.calls.length}个价  ${optionsChain.price}  HV:{optionsChain.hv}%
+                {optionsChain.symbol} {optionsChain.calls.length} strikes  ${optionsChain.price}  HV:{optionsChain.hv}%
               </h4>
               
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
                 {/* Calls */}
                 <div>
-                  <h5 style={{ color: '#3fb950', marginBottom: '3px', fontSize: '10px' }}>📈 Calls</h5>
+                  <h5 style={{ color: '#3fb950', marginBottom: '3px', fontSize: '10px' }}>Calls</h5>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
                     <thead>
                       <tr style={{ borderBottom: '1px solid #21262d' }}>
-                        <th style={{ padding: '1px', color: '#8b949e' }}>行权价</th>
-                        <th style={{ padding: '1px', color: '#8b949e' }}>价格</th>
+                        <th style={{ padding: '1px', color: '#8b949e' }}>Strike</th>
+                        <th style={{ padding: '1px', color: '#8b949e' }}>Price</th>
                         <th style={{ padding: '1px', color: '#8b949e' }}>Bid</th>
                         <th style={{ padding: '1px', color: '#8b949e' }}>Ask</th>
                       </tr>
@@ -134,12 +147,12 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
                 
                 {/* Puts */}
                 <div>
-                  <h5 style={{ color: '#f0883e', marginBottom: '3px', fontSize: '10px' }}>📉 Puts</h5>
+                  <h5 style={{ color: '#f0883e', marginBottom: '3px', fontSize: '10px' }}>Puts</h5>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
                     <thead>
                       <tr style={{ borderBottom: '1px solid #21262d' }}>
-                        <th style={{ padding: '1px', color: '#8b949e' }}>行权价</th>
-                        <th style={{ padding: '1px', color: '#8b949e' }}>价格</th>
+                        <th style={{ padding: '1px', color: '#8b949e' }}>Strike</th>
+                        <th style={{ padding: '1px', color: '#8b949e' }}>Price</th>
                         <th style={{ padding: '1px', color: '#8b949e' }}>Bid</th>
                         <th style={{ padding: '1px', color: '#8b949e' }}>Ask</th>
                       </tr>
@@ -165,7 +178,7 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
           
           {!optionsChain && (
             <div style={{ padding: '25px', background: '#161b22', borderRadius: '8px', textAlign: 'center', color: '#8b949e', fontSize: '12px' }}>
-              点击左侧股票 "期权" 按钮查看
+              Click "Options" button to view
             </div>
           )}
         </div>
