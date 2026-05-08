@@ -40,121 +40,87 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
         </button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '380px 1fr', gap: '20px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '360px 1fr', gap: '15px' }}>
         {/* 左边：推荐表 */}
         <div>
-          <div style={{ padding: '15px', background: '#161b22', borderRadius: '12px' }}>
-            <h4 style={{ marginTop: 0, marginBottom: '10px', color: '#d29922', fontSize: '14px' }}>🏆 TOP 10 推荐</h4>
+          <div style={{ padding: '12px', background: '#161b22', borderRadius: '10px' }}>
+            <h4 style={{ marginTop: 0, marginBottom: '8px', color: '#d29922', fontSize: '13px' }}>🏆 TOP 10 推荐</h4>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid #21262d' }}>
-                  <th style={{ padding: '6px', color: '#8b949e', fontSize: '11px' }}>Symbol</th>
-                  <th style={{ padding: '6px', color: '#8b949e', fontSize: '11px' }}>Price</th>
-                  <th style={{ padding: '6px', color: '#8b949e', fontSize: '11px' }}>HV</th>
-                  <th style={{ padding: '6px', color: '#8b949e', fontSize: '11px' }}>Score</th>
-                  <th style={{ padding: '6px', color: '#8b949e', fontSize: '11px' }}></th>
+                  <th style={{ padding: '4px', color: '#8b949e', fontSize: '10px' }}>Sym</th>
+                  <th style={{ padding: '4px', color: '#8b949e', fontSize: '10px' }}>Price</th>
+                  <th style={{ padding: '4px', color: '#8b949e', fontSize: '10px' }}>HV</th>
+                  <th style={{ padding: '4px', color: '#8b949e', fontSize: '10px' }}>Scr</th>
+                  <th style={{ padding: '4px', color: '#8b949e', fontSize: '10px' }}></th>
                 </tr>
               </thead>
               <tbody>
                 {candidates.slice(0, 10).map((c, i) => (
                   <tr key={i} style={{ borderBottom: '1px solid #21262d' }}>
-                    <td style={{ padding: '6px', fontFamily: 'monospace', fontWeight: 'bold', color: '#58a6ff', fontSize: '13px' }}>{c.symbol}</td>
-                    <td style={{ padding: '6px', fontSize: '13px' }}>${c.price.toFixed(2)}</td>
-                    <td style={{ padding: '6px', color: c.hv > 60 ? '#f0883e' : c.hv > 40 ? '#d29922' : '#3fb950', fontSize: '13px' }}>{c.hv}%</td>
-                    <td style={{ padding: '6px', fontWeight: 'bold', fontSize: '13px' }}>{c.score}</td>
-                    <td style={{ padding: '6px' }}>
+                    <td style={{ padding: '4px', fontFamily: 'monospace', fontWeight: 'bold', color: '#58a6ff', fontSize: '12px' }}>{c.symbol}</td>
+                    <td style={{ padding: '4px', fontSize: '12px' }}>${c.price.toFixed(0)}</td>
+                    <td style={{ padding: '4px', color: c.hv > 60 ? '#f0883e' : c.hv > 40 ? '#d29922' : '#3fb950', fontSize: '12px' }}>{c.hv}%</td>
+                    <td style={{ padding: '4px', fontWeight: 'bold', fontSize: '12px' }}>{c.score}</td>
+                    <td style={{ padding: '4px' }}>
                       <button
                         onClick={() => onGetOptions(c.symbol)}
                         style={{
-                          padding: '3px 8px',
+                          padding: '2px 6px',
                           background: '#1f6feb',
                           border: 'none',
                           color: 'white',
-                          borderRadius: '4px',
-                          fontSize: '11px',
+                          borderRadius: '3px',
+                          fontSize: '10px',
                           cursor: 'pointer',
                         }}
                       >
-                        Options
+                        期权
                       </button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            {candidates.length === 0 && (
-              <p style={{ color: '#8b949e', textAlign: 'center', padding: '20px' }}>
-                点击上方按钮分析股票池
-              </p>
-            )}
           </div>
           
-          <div style={{ marginTop: '15px', padding: '15px', background: '#161b22', borderRadius: '12px' }}>
-            <h4 style={{ marginTop: 0, marginBottom: '10px', fontSize: '14px' }}>🔎 个股分析</h4>
-            <div style={{ display: 'flex', gap: '8px' }}>
+          <div style={{ marginTop: '12px', padding: '12px', background: '#161b22', borderRadius: '10px' }}>
+            <h4 style={{ marginTop: 0, marginBottom: '8px', fontSize: '13px' }}>🔎 个股分析</h4>
+            <div style={{ display: 'flex', gap: '6px' }}>
               <input
                 placeholder="股票代码..."
                 value={searchSymbol}
                 onChange={e => setSearchSymbol(e.target.value.toUpperCase())}
-                onKeyDown={e => e.key === 'Enter' && onAnalyzeStock(searchSymbol)}
-                style={{
-                  flex: 1,
-                  padding: '10px',
-                  background: '#0d1117',
-                  border: '1px solid #21262d',
-                  color: '#e6edf3',
-                  fontSize: '13px',
-                  borderRadius: '6px',
-                }}
+                style={{ flex: 1, padding: '8px', background: '#0d1117', border: '1px solid #21262d', color: '#e6edf3', fontSize: '12px', borderRadius: '4px' }}
               />
               <button
                 onClick={() => { onAnalyzeStock(searchSymbol); onGetOptions(searchSymbol); }}
                 disabled={analyzing || !searchSymbol.trim()}
-                style={{
-                  padding: '10px 15px',
-                  background: '#1f6feb',
-                  border: 'none',
-                  color: 'white',
-                  borderRadius: '6px',
-                  fontSize: '13px',
-                  cursor: analyzing ? 'not-allowed' : 'pointer',
-                }}
+                style={{ padding: '8px 12px', background: '#1f6feb', border: 'none', color: 'white', borderRadius: '4px', fontSize: '12px', cursor: analyzing ? 'not-allowed' : 'pointer' }}
               >
                 分析
               </button>
             </div>
-            
-            {stockAnalysis && (
-              <div style={{ marginTop: '10px', padding: '10px', background: '#0d1117', borderRadius: '6px' }}>
-                <div style={{ fontSize: '12px', color: '#8b949e' }}>
-                  评分: <strong style={{ color: '#58a6ff', fontSize: '16px' }}>{stockAnalysis.score}/100</strong>
-                  <span style={{ marginLeft: '10px' }}>{stockAnalysis.recommendation}</span>
-                </div>
-              </div>
-            )}
           </div>
         </div>
 
-        {/* 右边：Options 链 - 不滚动，直接显示 */}
+        {/* 右边：Options 链 */}
         <div>
           {optionsChain && (
-            <div style={{ padding: '15px', background: '#161b22', borderRadius: '12px' }}>
-              <h4 style={{ marginTop: 0, marginBottom: '10px', color: '#58a6ff', fontSize: '14px' }}>
-                📊 {optionsChain.symbol} Options ({optionsChain.calls.length}个价)
-                <span style={{ fontSize: '12px', color: '#8b949e', marginLeft: '10px' }}>
-                  ${optionsChain.price} | HV:{optionsChain.hv}%
-                </span>
+            <div style={{ padding: '12px', background: '#161b22', borderRadius: '10px' }}>
+              <h4 style={{ marginTop: 0, marginBottom: '8px', color: '#58a6ff', fontSize: '13px' }}>
+                📊 {optionsChain.symbol} {optionsChain.calls.length}个价  ${optionsChain.price}  HV:{optionsChain.hv}%
               </h4>
               
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                {/* Calls - 全部显示 */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                {/* Calls */}
                 <div>
                   <h5 style={{ color: '#3fb950', marginBottom: '4px', fontSize: '11px' }}>📈 Calls</h5>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '9px' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                     <thead>
                       <tr style={{ borderBottom: '1px solid #21262d' }}>
-                        <th style={{ padding: '1px', color: '#8b949e' }}>Str</th>
-                        <th style={{ padding: '1px', color: '#8b949e' }}>Prc</th>
+                        <th style={{ padding: '1px', color: '#8b949e' }}>行权价</th>
+                        <th style={{ padding: '1px', color: '#8b949e' }}>价格</th>
                         <th style={{ padding: '1px', color: '#8b949e' }}>Bid</th>
                         <th style={{ padding: '1px', color: '#8b949e' }}>Ask</th>
                       </tr>
@@ -164,10 +130,10 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
                         const isATM = Math.abs(c.strike - optionsChain.price) < optionsChain.price * 0.01;
                         return (
                           <tr key={i} style={{ background: isATM ? '#1f3a5f' : 'transparent' }}>
-                            <td style={{ padding: '1px', fontFamily: 'monospace', fontWeight: isATM ? 'bold' : 'normal' }}>{c.strike.toFixed(2)}</td>
-                            <td style={{ padding: '1px', color: '#3fb950', fontWeight: isATM ? 'bold' : 'normal' }}>{c.price.toFixed(2)}</td>
-                            <td style={{ padding: '1px' }}>{c.bid.toFixed(2)}</td>
-                            <td style={{ padding: '1px' }}>{c.ask.toFixed(2)}</td>
+                            <td style={{ padding: '2px', fontFamily: 'monospace', fontWeight: isATM ? 'bold' : 'normal' }}>{c.strike.toFixed(0)}</td>
+                            <td style={{ padding: '2px', color: '#3fb950', fontWeight: isATM ? 'bold' : 'normal' }}>{c.price.toFixed(1)}</td>
+                            <td style={{ padding: '2px' }}>{c.bid.toFixed(1)}</td>
+                            <td style={{ padding: '2px' }}>{c.ask.toFixed(1)}</td>
                           </tr>
                         );
                       })}
@@ -175,14 +141,14 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
                   </table>
                 </div>
                 
-                {/* Puts - 全部显示 */}
+                {/* Puts */}
                 <div>
                   <h5 style={{ color: '#f0883e', marginBottom: '4px', fontSize: '11px' }}>📉 Puts</h5>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '9px' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                     <thead>
                       <tr style={{ borderBottom: '1px solid #21262d' }}>
-                        <th style={{ padding: '1px', color: '#8b949e' }}>Str</th>
-                        <th style={{ padding: '1px', color: '#8b949e' }}>Prc</th>
+                        <th style={{ padding: '1px', color: '#8b949e' }}>行权价</th>
+                        <th style={{ padding: '1px', color: '#8b949e' }}>价格</th>
                         <th style={{ padding: '1px', color: '#8b949e' }}>Bid</th>
                         <th style={{ padding: '1px', color: '#8b949e' }}>Ask</th>
                       </tr>
@@ -192,10 +158,10 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
                         const isATM = Math.abs(p.strike - optionsChain.price) < optionsChain.price * 0.01;
                         return (
                           <tr key={i} style={{ background: isATM ? '#3d1f1f' : 'transparent' }}>
-                            <td style={{ padding: '1px', fontFamily: 'monospace', fontWeight: isATM ? 'bold' : 'normal' }}>{p.strike.toFixed(2)}</td>
-                            <td style={{ padding: '1px', color: '#f0883e', fontWeight: isATM ? 'bold' : 'normal' }}>{p.price.toFixed(2)}</td>
-                            <td style={{ padding: '1px' }}>{p.bid.toFixed(2)}</td>
-                            <td style={{ padding: '1px' }}>{p.ask.toFixed(2)}</td>
+                            <td style={{ padding: '2px', fontFamily: 'monospace', fontWeight: isATM ? 'bold' : 'normal' }}>{p.strike.toFixed(0)}</td>
+                            <td style={{ padding: '2px', color: '#f0883e', fontWeight: isATM ? 'bold' : 'normal' }}>{p.price.toFixed(1)}</td>
+                            <td style={{ padding: '2px' }}>{p.bid.toFixed(1)}</td>
+                            <td style={{ padding: '2px' }}>{p.ask.toFixed(1)}</td>
                           </tr>
                         );
                       })}
@@ -207,8 +173,8 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
           )}
           
           {!optionsChain && (
-            <div style={{ padding: '40px', background: '#161b22', borderRadius: '12px', textAlign: 'center', color: '#8b949e' }}>
-              <p>点击左侧股票的 "Options" 查看41个价格</p>
+            <div style={{ padding: '30px', background: '#161b22', borderRadius: '10px', textAlign: 'center', color: '#8b949e', fontSize: '13px' }}>
+              点击左侧股票 "期权" 按钮查看
             </div>
           )}
         </div>
