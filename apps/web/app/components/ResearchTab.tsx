@@ -18,9 +18,9 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
 
   return (
     <div style={{ padding: '20px' }}>
-      <h3 style={{ marginTop: 0, color: '#58a6ff', marginBottom: '15px', fontSize: '18px' }}>Wheel Strategy Research</h3>
+      <h3 style={{ marginTop: 0, color: '#58a6ff', marginBottom: '15px', fontSize: '18px', textAlign: 'center' }}>Wheel Strategy Research</h3>
       
-      <div style={{ marginBottom: '15px' }}>
+      <div style={{ marginBottom: '15px', textAlign: 'center' }}>
         <button
           onClick={onAnalyze}
           disabled={analyzing}
@@ -43,24 +43,24 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
         {/* Left: Candidates */}
         <div>
           <div style={{ padding: '10px', background: '#161b22', borderRadius: '8px' }}>
-            <h4 style={{ marginTop: 0, marginBottom: '6px', color: '#d29922', fontSize: '12px' }}>TOP 10 Candidates</h4>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <h4 style={{ marginTop: 0, marginBottom: '6px', color: '#d29922', fontSize: '12px', textAlign: 'center' }}>TOP 10 Candidates</h4>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px', textAlign: 'center' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid #21262d' }}>
-                  <th style={{ padding: '3px', color: '#8b949e', fontSize: '9px' }}>Sym</th>
-                  <th style={{ padding: '3px', color: '#8b949e', fontSize: '9px' }}>Price</th>
-                  <th style={{ padding: '3px', color: '#8b949e', fontSize: '9px' }}>HV</th>
-                  <th style={{ padding: '3px', color: '#8b949e', fontSize: '9px' }}>Scr</th>
-                  <th style={{ padding: '3px', color: '#8b949e', fontSize: '9px' }}></th>
+                  <th style={{ padding: '3px', color: '#8b949e' }}>Sym</th>
+                  <th style={{ padding: '3px', color: '#8b949e' }}>Price</th>
+                  <th style={{ padding: '3px', color: '#8b949e' }}>HV</th>
+                  <th style={{ padding: '3px', color: '#8b949e' }}>Scr</th>
+                  <th style={{ padding: '3px', color: '#8b949e' }}></th>
                 </tr>
               </thead>
               <tbody>
                 {candidates.slice(0, 10).map((c, i) => (
                   <tr key={i} style={{ borderBottom: '1px solid #21262d' }}>
-                    <td style={{ padding: '3px', fontFamily: 'monospace', fontWeight: 'bold', color: '#58a6ff', fontSize: '11px' }}>{c.symbol}</td>
-                    <td style={{ padding: '3px', fontSize: '11px' }}>${c.price.toFixed(0)}</td>
-                    <td style={{ padding: '3px', color: c.hv > 60 ? '#f0883e' : c.hv > 40 ? '#d29922' : '#3fb950', fontSize: '11px' }}>{c.hv}%</td>
-                    <td style={{ padding: '3px', fontWeight: 'bold', fontSize: '11px' }}>{c.score}</td>
+                    <td style={{ padding: '3px', fontFamily: 'monospace', fontWeight: 'bold', color: '#58a6ff' }}>{c.symbol}</td>
+                    <td style={{ padding: '3px' }}>${c.price.toFixed(0)}</td>
+                    <td style={{ padding: '3px', color: c.hv > 60 ? '#f0883e' : c.hv > 40 ? '#d29922' : '#3fb950' }}>{c.hv}%</td>
+                    <td style={{ padding: '3px', fontWeight: 'bold' }}>{c.score}</td>
                     <td style={{ padding: '3px' }}>
                       <button
                         onClick={() => onGetOptions(c.symbol)}
@@ -76,13 +76,13 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
           </div>
           
           <div style={{ marginTop: '10px', padding: '10px', background: '#161b22', borderRadius: '8px' }}>
-            <h4 style={{ marginTop: 0, marginBottom: '6px', fontSize: '12px' }}>Stock Analysis</h4>
+            <h4 style={{ marginTop: 0, marginBottom: '6px', fontSize: '12px', textAlign: 'center' }}>Stock Analysis</h4>
             <div style={{ display: 'flex', gap: '5px' }}>
               <input
                 placeholder="Symbol..."
                 value={searchSymbol}
                 onChange={e => setSearchSymbol(e.target.value.toUpperCase())}
-                style={{ flex: 1, padding: '6px', background: '#0d1117', border: '1px solid #21262d', color: '#e6edf3', fontSize: '11px', borderRadius: '4px' }}
+                style={{ flex: 1, padding: '6px', background: '#0d1117', border: '1px solid #21262d', color: '#e6edf3', fontSize: '11px', borderRadius: '4px', textAlign: 'center' }}
               />
               <button
                 onClick={() => { onAnalyzeStock(searchSymbol); onGetOptions(searchSymbol); }}
@@ -93,9 +93,8 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
               </button>
             </div>
             
-            {/* Show stock score */}
             {stockAnalysis && (
-              <div style={{ marginTop: '8px', padding: '8px', background: '#0d1117', borderRadius: '4px', fontSize: '12px' }}>
+              <div style={{ marginTop: '8px', padding: '8px', background: '#0d1117', borderRadius: '4px', fontSize: '12px', textAlign: 'center' }}>
                 <div style={{ color: '#8b949e' }}>
                   Score: <strong style={{ color: '#58a6ff', fontSize: '16px' }}>{stockAnalysis.score}/100</strong>
                   <span style={{ marginLeft: '8px' }}>{stockAnalysis.recommendation}</span>
@@ -112,15 +111,15 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
         <div>
           {optionsChain && (
             <div style={{ padding: '10px', background: '#161b22', borderRadius: '8px' }}>
-              <h4 style={{ marginTop: 0, marginBottom: '6px', color: '#58a6ff', fontSize: '12px' }}>
+              <h4 style={{ marginTop: 0, marginBottom: '6px', color: '#58a6ff', fontSize: '12px', textAlign: 'center' }}>
                 {optionsChain.symbol} {optionsChain.calls.length} strikes  ${optionsChain.price}  HV:{optionsChain.hv}%
               </h4>
               
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
                 {/* Calls */}
                 <div>
-                  <h5 style={{ color: '#3fb950', marginBottom: '3px', fontSize: '10px' }}>Calls</h5>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+                  <h5 style={{ color: '#3fb950', marginBottom: '3px', fontSize: '10px', textAlign: 'center' }}>Calls</h5>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', textAlign: 'center' }}>
                     <thead>
                       <tr style={{ borderBottom: '1px solid #21262d' }}>
                         <th style={{ padding: '1px', color: '#8b949e' }}>Strike</th>
@@ -147,8 +146,8 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
                 
                 {/* Puts */}
                 <div>
-                  <h5 style={{ color: '#f0883e', marginBottom: '3px', fontSize: '10px' }}>Puts</h5>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+                  <h5 style={{ color: '#f0883e', marginBottom: '3px', fontSize: '10px', textAlign: 'center' }}>Puts</h5>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', textAlign: 'center' }}>
                     <thead>
                       <tr style={{ borderBottom: '1px solid #21262d' }}>
                         <th style={{ padding: '1px', color: '#8b949e' }}>Strike</th>
