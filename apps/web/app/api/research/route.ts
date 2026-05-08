@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 
 const BASE_URL = 'https://paper-api.alpaca.markets/v2';
 
-// 股票候选池
 const CANDIDATES = [
   'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'NVDA', 'NFLX', 'TSLA',
   'AMD', 'INTC', 'QCOM', 'TXN', 'AVGO', 'MU', 'LRCX', 'KLAC',
@@ -11,7 +10,6 @@ const CANDIDATES = [
   'JPM', 'BAC', 'WFC', 'GS', 'MS', 'V', 'MA', 'PYPL',
 ];
 
-// 从 Yahoo 获取价格
 async function getYahooPrice(symbol: string): Promise<number> {
   try {
     const res = await fetch(
@@ -25,7 +23,6 @@ async function getYahooPrice(symbol: string): Promise<number> {
   }
 }
 
-// 获取 HV
 async function getYahooHV(symbol: string): Promise<number> {
   try {
     const res = await fetch(
@@ -35,13 +32,11 @@ async function getYahooHV(symbol: string): Promise<number> {
     const data = await res.json();
     const closes = data?.chart?.result?.[0]?.indicators?.quote?.[0]?.close?.filter((p: number) => p > 0);
     if (!closes || closes.length < 20) return 0;
-    
     const returns = [];
     for (let i = 1; i < closes.length; i++) {
       if (closes[i] && closes[i-1]) returns.push(Math.log(closes[i] / closes[i-1]));
     }
     if (returns.length < 20) return 0;
-    
     const recent = returns.slice(-20);
     const mean = recent.reduce((a, b) => a + b, 0) / recent.length;
     const variance = recent.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / recent.length;
@@ -51,7 +46,7 @@ async function getYahooHV(symbol: string): Promise<number> {
   }
 }
 
-// 估算期权价格
+// 修复后的期权定价 - 更准确的估算
 function estimateOptionPrice(
   stockPrice: number,
   strikePrice: number,
@@ -61,34 +56,42 @@ function estimateOptionPrice(
 ): number {
   const t = daysToExpiry / 365;
   const v = volatility / 100;
+  const priceRatio = stockPrice / strikePrice;
   
-  if (t <= 0) {
-    return isCall ? Math.max(0, stockPrice - strikePrice) : Math.max(0, strikePrice - stockPrice);
-  }
-  
-  const intrinsic = isCall 
+  // 内在价值
+  const intrinsic = isCall
     ? Math.max(0, stockPrice - strikePrice)
     : Math.max(0, strikePrice - stockPrice);
-    
-  const timeValue = stockPrice * v * Math.sqrt(t) * 0.4;
+  
+  // 时间价值 - 基于 Moneyness 调整
+  let moneynessFactor = 1;
+  if (isCall) {
+    if (priceRatio < 0.8) moneynessFactor = 0.1; // deep ITM
+    else if (priceRatio < 0.9) moneynessFactor = 0.5;
+    else if (priceRatio > 1.2) moneynessFactor = 0.1; // deep OTM
+    else if (priceRatio > 1.1) moneynessFactor = 0.5;
+  } else {
+    if (priceRatio > 1.2) moneynessFactor = 0.1;
+    else if (priceRatio > 1.1) moneynessFactor = 0.5;
+    if (priceRatio < 0.8) moneynessFactor = 0.1;
+    else if (priceRatio < 0.9) moneynessFactor = 0.5;
+  }
+  
+  const timeValue = stockPrice * v * Math.sqrt(t) * 0.3 * moneynessFactor;
   const extrinsic = Math.max(0, timeValue);
   
   return Math.round((intrinsic + extrinsic) * 100) / 100;
 }
 
-// 生成 Options 链 - 上下各20个
 function generateOptionsChain(symbol: string, price: number, hv: number) {
-  // 生成 20个上方 + 20个下方 + ATM = 41个行权价
+  // 20 below + ATM + 20 above = 41 strikes
   const strikes: number[] = [];
-  const step = price * 0.02; // 2% 间隔
+  const step = price * 0.02;
   
-  // 下方 20 个
   for (let i = 20; i >= 1; i--) {
     strikes.push(Math.round((price - i * step) * 100) / 100);
   }
-  // ATM
   strikes.push(price);
-  // 上方 20 个
   for (let i = 1; i <= 20; i++) {
     strikes.push(Math.round((price + i * step) * 100) / 100);
   }
@@ -98,22 +101,18 @@ function generateOptionsChain(symbol: string, price: number, hv: number) {
   const puts = [];
   
   for (const s of strikes) {
-    const callPrice = estimateOptionPrice(price, s, days, hv, true);
-    const putPrice = estimateOptionPrice(price, s, days, hv, false);
-    
     calls.push({
       strike: s,
-      price: callPrice,
-      bid: Math.round(callPrice * 0.95 * 100) / 100,
-      ask: Math.round(callPrice * 1.05 * 100) / 100,
+      price: estimateOptionPrice(price, s, days, hv, true),
+      bid: 0,
+      ask: 0,
       iv: hv,
     });
-    
     puts.push({
       strike: s,
-      price: putPrice,
-      bid: Math.round(putPrice * 0.95 * 100) / 100,
-      ask: Math.round(putPrice * 1.05 * 100) / 100,
+      price: estimateOptionPrice(price, s, days, hv, false),
+      bid: 0,
+      ask: 0,
       iv: hv,
     });
   }
@@ -122,13 +121,6 @@ function generateOptionsChain(symbol: string, price: number, hv: number) {
     symbol,
     price,
     hv,
-    expirations: [
-      new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      new Date(Date.now() + 21 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    ],
-    strikes,
     calls,
     puts,
   };
