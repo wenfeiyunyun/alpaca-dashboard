@@ -44,7 +44,112 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
       {/* 主体：左右并排 */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
         
-        {/* 左边：Options 链 */}
+        {/* 左边：推荐表 */}
+        <div>
+          <div style={{ padding: '15px', background: '#161b22', borderRadius: '12px' }}>
+            <h4 style={{ marginTop: 0, marginBottom: '10px', color: '#d29922', fontSize: '14px' }}>🏆 TOP 10 推荐</h4>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid #21262d' }}>
+                  <th style={{ padding: '6px', color: '#8b949e', fontSize: '11px' }}>Symbol</th>
+                  <th style={{ padding: '6px', color: '#8b949e', fontSize: '11px' }}>Price</th>
+                  <th style={{ padding: '6px', color: '#8b949e', fontSize: '11px' }}>HV</th>
+                  <th style={{ padding: '6px', color: '#8b949e', fontSize: '11px' }}>Score</th>
+                  <th style={{ padding: '6px', color: '#8b949e', fontSize: '11px' }}></th>
+                </tr>
+              </thead>
+              <tbody>
+                {candidates.slice(0, 10).map((c, i) => (
+                  <tr key={i} style={{ borderBottom: '1px solid #21262d' }}>
+                    <td style={{ padding: '6px', fontFamily: 'monospace', fontWeight: 'bold', color: '#58a6ff', fontSize: '13px' }}>{c.symbol}</td>
+                    <td style={{ padding: '6px', fontSize: '13px' }}>${c.price.toFixed(2)}</td>
+                    <td style={{ padding: '6px', color: c.hv > 60 ? '#f0883e' : c.hv > 40 ? '#d29922' : '#3fb950', fontSize: '13px' }}>{c.hv}%</td>
+                    <td style={{ padding: '6px', fontWeight: 'bold', fontSize: '13px' }}>{c.score}</td>
+                    <td style={{ padding: '6px' }}>
+                      <button
+                        onClick={() => onGetOptions(c.symbol)}
+                        style={{
+                          padding: '3px 8px',
+                          background: '#1f6feb',
+                          border: 'none',
+                          color: 'white',
+                          borderRadius: '4px',
+                          fontSize: '11px',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Options
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {candidates.length === 0 && (
+              <p style={{ color: '#8b949e', textAlign: 'center', padding: '20px' }}>
+                点击上方按钮分析股票池
+              </p>
+            )}
+          </div>
+          
+          {/* 个股分析输入 */}
+          <div style={{ marginTop: '15px', padding: '15px', background: '#161b22', borderRadius: '12px' }}>
+            <h4 style={{ marginTop: 0, marginBottom: '10px', fontSize: '14px' }}>🔎 个股分析</h4>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <input
+                placeholder="股票代码..."
+                value={searchSymbol}
+                onChange={e => setSearchSymbol(e.target.value.toUpperCase())}
+                onKeyDown={e => e.key === 'Enter' && onAnalyzeStock(searchSymbol)}
+                style={{
+                  flex: 1,
+                  padding: '10px',
+                  background: '#0d1117',
+                  border: '1px solid #21262d',
+                  color: '#e6edf3',
+                  fontSize: '13px',
+                  borderRadius: '6px',
+                }}
+              />
+              <button
+                onClick={() => { onAnalyzeStock(searchSymbol); onGetOptions(searchSymbol); }}
+                disabled={analyzing || !searchSymbol.trim()}
+                style={{
+                  padding: '10px 15px',
+                  background: '#1f6feb',
+                  border: 'none',
+                  color: 'white',
+                  borderRadius: '6px',
+                  fontSize: '13px',
+                  cursor: analyzing ? 'not-allowed' : 'pointer',
+                }}
+              >
+                分析
+              </button>
+            </div>
+            
+            {stockAnalysis && (
+              <div style={{ marginTop: '10px', padding: '10px', background: '#0d1117', borderRadius: '6px' }}>
+                <div style={{ fontSize: '12px', color: '#8b949e' }}>
+                  评分: <strong style={{ color: '#58a6ff', fontSize: '16px' }}>{stockAnalysis.score}/100</strong>
+                  <span style={{ marginLeft: '10px' }}>{stockAnalysis.recommendation}</span>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          {/* 说明 */}
+          <div style={{ marginTop: '15px', padding: '12px', background: '#161b22', borderRadius: '8px' }}>
+            <h5 style={{ marginTop: 0, marginBottom: '8px', fontSize: '12px', color: '#8b949e' }}>📋 评分说明</h5>
+            <ul style={{ margin: 0, paddingLeft: '18px', color: '#8b949e', fontSize: '11px' }}>
+              <li>HV &gt; 60%: 高权利金</li>
+              <li>HV 40-60%: 中高权利金</li>
+              <li>HV 20-40%: 推荐</li>
+            </ul>
+          </div>
+        </div>
+
+        {/* 右边：Options 链 */}
         <div>
           {optionsChain && (
             <div style={{ padding: '15px', background: '#161b22', borderRadius: '12px' }}>
@@ -109,110 +214,11 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
             </div>
           )}
           
-          {/* 个股分析输入 */}
-          <div style={{ marginTop: '15px', padding: '15px', background: '#161b22', borderRadius: '12px' }}>
-            <h4 style={{ marginTop: 0, marginBottom: '10px', fontSize: '14px' }}>🔎 个股分析</h4>
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <input
-                placeholder="股票代码..."
-                value={searchSymbol}
-                onChange={e => setSearchSymbol(e.target.value.toUpperCase())}
-                onKeyDown={e => e.key === 'Enter' && onAnalyzeStock(searchSymbol)}
-                style={{
-                  flex: 1,
-                  padding: '10px',
-                  background: '#0d1117',
-                  border: '1px solid #21262d',
-                  color: '#e6edf3',
-                  fontSize: '13px',
-                  borderRadius: '6px',
-                }}
-              />
-              <button
-                onClick={() => { onAnalyzeStock(searchSymbol); onGetOptions(searchSymbol); }}
-                disabled={analyzing || !searchSymbol.trim()}
-                style={{
-                  padding: '10px 15px',
-                  background: '#1f6feb',
-                  border: 'none',
-                  color: 'white',
-                  borderRadius: '6px',
-                  fontSize: '13px',
-                  cursor: analyzing ? 'not-allowed' : 'pointer',
-                }}
-              >
-                分析
-              </button>
+          {!optionsChain && (
+            <div style={{ padding: '40px', background: '#161b22', borderRadius: '12px', textAlign: 'center', color: '#8b949e' }}>
+              <p>点击左侧股票的 "Options" 按钮查看期权价格</p>
             </div>
-            
-            {stockAnalysis && (
-              <div style={{ marginTop: '10px', padding: '10px', background: '#0d1117', borderRadius: '6px' }}>
-                <div style={{ fontSize: '12px', color: '#8b949e' }}>
-                  评分: <strong style={{ color: '#58a6ff', fontSize: '16px' }}>{stockAnalysis.score}/100</strong>
-                  <span style={{ marginLeft: '10px' }}>{stockAnalysis.recommendation}</span>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* 右边：推荐表 */}
-        <div>
-          <div style={{ padding: '15px', background: '#161b22', borderRadius: '12px' }}>
-            <h4 style={{ marginTop: 0, marginBottom: '10px', color: '#d29922', fontSize: '14px' }}>🏆 TOP 10 推荐</h4>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid #21262d' }}>
-                  <th style={{ padding: '6px', color: '#8b949e', fontSize: '11px' }}>Symbol</th>
-                  <th style={{ padding: '6px', color: '#8b949e', fontSize: '11px' }}>Price</th>
-                  <th style={{ padding: '6px', color: '#8b949e', fontSize: '11px' }}>HV</th>
-                  <th style={{ padding: '6px', color: '#8b949e', fontSize: '11px' }}>Score</th>
-                  <th style={{ padding: '6px', color: '#8b949e', fontSize: '11px' }}></th>
-                </tr>
-              </thead>
-              <tbody>
-                {candidates.slice(0, 10).map((c, i) => (
-                  <tr key={i} style={{ borderBottom: '1px solid #21262d' }}>
-                    <td style={{ padding: '6px', fontFamily: 'monospace', fontWeight: 'bold', color: '#58a6ff', fontSize: '13px' }}>{c.symbol}</td>
-                    <td style={{ padding: '6px', fontSize: '13px' }}>${c.price.toFixed(2)}</td>
-                    <td style={{ padding: '6px', color: c.hv > 60 ? '#f0883e' : c.hv > 40 ? '#d29922' : '#3fb950', fontSize: '13px' }}>{c.hv}%</td>
-                    <td style={{ padding: '6px', fontWeight: 'bold', fontSize: '13px' }}>{c.score}</td>
-                    <td style={{ padding: '6px' }}>
-                      <button
-                        onClick={() => onGetOptions(c.symbol)}
-                        style={{
-                          padding: '3px 8px',
-                          background: '#1f6feb',
-                          border: 'none',
-                          color: 'white',
-                          borderRadius: '4px',
-                          fontSize: '11px',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        Options
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {candidates.length === 0 && (
-              <p style={{ color: '#8b949e', textAlign: 'center', padding: '20px' }}>
-                点击上方按钮分析股票池
-              </p>
-            )}
-          </div>
-          
-          {/* 说明 */}
-          <div style={{ marginTop: '15px', padding: '12px', background: '#161b22', borderRadius: '8px' }}>
-            <h5 style={{ marginTop: 0, marginBottom: '8px', fontSize: '12px', color: '#8b949e' }}>📋 评分说明</h5>
-            <ul style={{ margin: 0, paddingLeft: '18px', color: '#8b949e', fontSize: '11px' }}>
-              <li>HV &gt; 60%: 高权利金</li>
-              <li>HV 40-60%: 中高权利金</li>
-              <li>HV 20-40%: 推荐</li>
-            </ul>
-          </div>
+          )}
         </div>
       </div>
     </div>
