@@ -71,17 +71,23 @@ export default function Dashboard() {
   const handleSelectPrice = (strike: number, type: 'call' | 'put', price: number) => {
     setTradeSymbol(optionsChain ? `${optionsChain.symbol}${type === 'call' ? 'C' : 'P'}${Math.floor(strike)}` : '');
     setTradePrice(price.toString());
+    const expiry = tradeExpiry ? Math.floor(parseFloat(tradeExpiry)) : 34;
+    setTradeSymbol(optionsChain ? `${optionsChain.symbol}${type === 'call' ? 'C' : 'P'}${Math.floor(strike)}${expiry}` : '');
     setActiveTab('research');
   };
 
   const handleSelectStrike = (strike: number, type: 'call' | 'put') => {
-    setTradeSymbol(optionsChain ? `${optionsChain.symbol}${type === 'call' ? 'C' : 'P'}${Math.floor(strike)}` : '');
+    const expiry = tradeExpiry ? Math.floor(parseFloat(tradeExpiry)) : 34;
+    setTradeSymbol(optionsChain ? `${optionsChain.symbol}${type === 'call' ? 'C' : 'P'}${Math.floor(strike)}${expiry}` : '');
     setTradePrice('');
   };
 
   const handleSelectBidAsk = (price: number, type: 'call' | 'put', ba: 'bid' | 'ask') => {
-    setTradeSymbol(optionsChain ? `${optionsChain.symbol}${type === 'call' ? 'C' : 'P'}${Math.floor(parseFloat(stockAnalysis?.price || '100'))}` : '');
+    const expiry = tradeExpiry ? Math.floor(parseFloat(tradeExpiry)) : 34;
+    setTradeSymbol(optionsChain ? `${optionsChain.symbol}${type === 'call' ? 'C' : 'P'}${Math.floor(parseFloat(stockAnalysis?.price || '100'))}${expiry}` : '');
     setTradePrice(price.toString());
+    const expiry = tradeExpiry ? Math.floor(parseFloat(tradeExpiry)) : 34;
+    setTradeSymbol(optionsChain ? `${optionsChain.symbol}${type === 'call' ? 'C' : 'P'}${Math.floor(strike)}${expiry}` : '');
   };
 
   const handleTrade = async (side: string) => {
@@ -168,7 +174,7 @@ export default function Dashboard() {
             onAnalyzeStock={analyzeStock}
             onGetOptions={getOptions}
             analyzing={analyzing}
-            onSelectPrice={handleSelectPrice} onSelectStrike={handleSelectStrike} onSelectBidAsk={handleSelectBidAsk}
+            onSelectPrice={handleSelectPrice} onSelectStrike={handleSelectStrike} onSelectBidAsk={handleSelectBidAsk} tradeExpiry={tradeExpiry} setTradeExpiry={setTradeExpiry}
             tradeSymbol={tradeSymbol} tradePrice={tradePrice} tradeQty={tradeQty}
             setTradeSymbol={setTradeSymbol} setTradePrice={setTradePrice} setTradeQty={setTradeQty}
             onTrade={handleTrade}

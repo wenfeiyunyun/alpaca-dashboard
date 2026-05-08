@@ -10,6 +10,8 @@ interface TradeProps {
   setTradeSymbol?: (v: string) => void;
   setTradePrice?: (v: string) => void;
   setTradeQty?: (v: string) => void;
+  tradeExpiry?: string;
+  setTradeExpiry?: (v: string) => void;
   onTrade?: (side: string) => void;
 }
 
@@ -20,6 +22,8 @@ interface ResearchProps {
   setTradeSymbol?: (v: string) => void;
   setTradePrice?: (v: string) => void;
   setTradeQty?: (v: string) => void;
+  tradeExpiry?: string;
+  setTradeExpiry?: (v: string) => void;
   onTrade?: (side: string) => void;
 
   onSelectPrice?: (strike: number, type: 'call' | 'put', price: number) => void;
@@ -34,7 +38,7 @@ interface ResearchProps {
   analyzing: boolean;
 }
 
-export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze, onAnalyzeStock, onGetOptions, analyzing, onSelectPrice, tradeSymbol, tradePrice, tradeQty, setTradeSymbol, setTradePrice, setTradeQty, onTrade, onSelectStrike, onSelectBidAsk }: ResearchProps) {
+export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze, onAnalyzeStock, onGetOptions, analyzing, onSelectPrice, tradeSymbol, tradePrice, tradeQty, setTradeSymbol, setTradePrice, setTradeQty, onTrade, onSelectStrike, onSelectBidAsk, tradeExpiry, setTradeExpiry }: ResearchProps) {
   const [searchSymbol, setSearchSymbol] = useState('');
 
   return (
@@ -116,10 +120,22 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
             
             <div style={{ marginTop: '8px', padding: '8px', background: '#161b22', borderRadius: '6px' }}>
               <h5 style={{ marginTop: 0, marginBottom: '6px', color: '#58a6ff', fontSize: '11px', textAlign: 'center' }}>Quick Trade</h5>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '4px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '4px' }}>
                 <input placeholder='Symbol' value={tradeSymbol || ''} onChange={e => setTradeSymbol?.(e.target.value)} style={{ padding: '5px', background: '#0d1117', border: '1px solid #21262d', color: '#e6edf3', fontSize: '10px', borderRadius: '3px' }} />
                 <input placeholder='Price' value={tradePrice || ''} onChange={e => setTradePrice?.(e.target.value)} style={{ padding: '5px', background: '#0d1117', border: '1px solid #21262d', color: '#e6edf3', fontSize: '10px', borderRadius: '3px' }} />
-                <input placeholder='Qty' value={tradeQty || '1'} onChange={e => setTradeQty?.(e.target.value)} style={{ padding: '5px', background: '#0d1117', border: '1px solid #21262d', color: '#e6edf3', fontSize: '10px', borderRadius: '3px' }} />
+                <select value={tradeExpiry || ''} onChange={e => setTradeExpiry?.(e.target.value)} style={{ padding: '5px', background: '#0d1117', border: '1px solid #21262d', color: '#e6edf3', fontSize: '10px', borderRadius: '3px' }}>
+                <option value=''>过期天</option>
+                <option value='1'>1天</option>
+                <option value='2'>2天</option>
+                <option value='4'>4天</option>
+                <option value='6'>6天</option>
+                <option value='9'>9天</option>
+                <option value='11'>11天</option>
+                <option value='20'>20天</option>
+                <option value='27'>27天</option>
+                <option value='34'>34天</option>
+              </select>
+              <input placeholder='Qty' value={tradeQty || '1'} onChange={e => setTradeQty?.(e.target.value)} style={{ padding: '5px', background: '#0d1117', border: '1px solid #21262d', color: '#e6edf3', fontSize: '10px', borderRadius: '3px' }} />
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px', marginTop: '4px' }}>
                 <button onClick={() => onTrade?.('buy')} style={{ padding: '6px', background: '#238636', border: 'none', color: 'white', borderRadius: '3px', fontSize: '10px', fontWeight: 'bold', cursor: 'pointer' }}>BUY</button>
