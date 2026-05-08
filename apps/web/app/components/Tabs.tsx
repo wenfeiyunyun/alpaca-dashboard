@@ -114,12 +114,11 @@ interface TradeProps {
 }
 
 export function TradeTab({ onSubmit, loading, message, symbol, price }: TradeProps) {
-  const [sym, setSym] = useState(symbol || 'AAPL');
-  const [prc, setPrc] = useState(price || '');
-  const [symbol, setSymbol] = React.useState('AAPL');
+  const [sym, setSym] = React.useState(symbol || 'AAPL');
+  const [prc, setPrc] = React.useState(price || '');
   const [qty, setQty] = React.useState('1');
   const [side, setSide] = React.useState('buy');
-  const [price, setPrice] = React.useState('');
+  const [type, setType] = React.useState('market');
   const [type, setType] = React.useState('market');
 
   return (
