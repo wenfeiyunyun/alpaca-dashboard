@@ -85,68 +85,66 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
         </div>
       )}
 
-      {/* Options 链显示 */}
+      {/* Options 链 - 左右排列 */}
       {optionsChain && (
         <div style={{ marginBottom: '30px', padding: '20px', background: '#161b22', borderRadius: '12px' }}>
-          <h4 style={{ marginTop: 0, color: '#58a6ff' }}>
+          <h4 style={{ marginTop: 0, color: '#58a6ff', marginBottom: '15px' }}>
             📊 {optionsChain.symbol} Options 链
             <span style={{ fontSize: '14px', color: '#8b949e', marginLeft: '15px' }}>
               价格: ${optionsChain.price.toFixed(2)} | HV: {optionsChain.hv}%
             </span>
           </h4>
           
-          {/* Calls */}
-          <div style={{ marginBottom: '20px' }}>
-            <h5 style={{ color: '#3fb950', marginBottom: '10px' }}>📈 Calls (看涨)</h5>
-            <table style={{ width: '100%', borderCollapse: 'collapse', maxWidth: '500px' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid #21262d' }}>
-                  <th style={{ padding: '6px', color: '#8b949e' }}>Strike</th>
-                  <th style={{ padding: '6px', color: '#8b949e' }}>Price</th>
-                  <th style={{ padding: '6px', color: '#8b949e' }}>Bid</th>
-                  <th style={{ padding: '6px', color: '#8b949e' }}>Ask</th>
-                  <th style={{ padding: '6px', color: '#8b949e' }}>IV</th>
-                </tr>
-              </thead>
-              <tbody>
-                {optionsChain.calls.slice(0, 8).map((c, i) => (
-                  <tr key={i} style={{ borderBottom: '1px solid #21262d' }}>
-                    <td style={{ padding: '6px', fontFamily: 'monospace' }}>${c.strike}</td>
-                    <td style={{ padding: '6px', color: '#3fb950', fontWeight: 'bold' }}>${c.price.toFixed(2)}</td>
-                    <td style={{ padding: '6px' }}>${c.bid.toFixed(2)}</td>
-                    <td style={{ padding: '6px' }}>${c.ask.toFixed(2)}</td>
-                    <td style={{ padding: '6px', color: '#8b949e' }}>{c.iv}%</td>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+            {/* Calls - 左边 */}
+            <div>
+              <h5 style={{ color: '#3fb950', marginBottom: '10px' }}>📈 Calls (看涨)</h5>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid #21262d' }}>
+                    <th style={{ padding: '6px', color: '#8b949e', fontSize: '12px' }}>Strike</th>
+                    <th style={{ padding: '6px', color: '#8b949e', fontSize: '12px' }}>Price</th>
+                    <th style={{ padding: '6px', color: '#8b949e', fontSize: '12px' }}>Bid</th>
+                    <th style={{ padding: '6px', color: '#8b949e', fontSize: '12px' }}>Ask</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          
-          {/* Puts */}
-          <div>
-            <h5 style={{ color: '#f0883e', marginBottom: '10px' }}>📉 Puts (看跌)</h5>
-            <table style={{ width: '100%', borderCollapse: 'collapse', maxWidth: '500px' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid #21262d' }}>
-                  <th style={{ padding: '6px', color: '#8b949e' }}>Strike</th>
-                  <th style={{ padding: '6px', color: '#8b949e' }}>Price</th>
-                  <th style={{ padding: '6px', color: '#8b949e' }}>Bid</th>
-                  <th style={{ padding: '6px', color: '#8b949e' }}>Ask</th>
-                  <th style={{ padding: '6px', color: '#8b949e' }}>IV</th>
-                </tr>
-              </thead>
-              <tbody>
-                {optionsChain.puts.slice(0, 8).map((p, i) => (
-                  <tr key={i} style={{ borderBottom: '1px solid #21262d' }}>
-                    <td style={{ padding: '6px', fontFamily: 'monospace' }}>${p.strike}</td>
-                    <td style={{ padding: '6px', color: '#f0883e', fontWeight: 'bold' }}>${p.price.toFixed(2)}</td>
-                    <td style={{ padding: '6px' }}>${p.bid.toFixed(2)}</td>
-                    <td style={{ padding: '6px' }}>${p.ask.toFixed(2)}</td>
-                    <td style={{ padding: '6px', color: '#8b949e' }}>{p.iv}%</td>
+                </thead>
+                <tbody>
+                  {optionsChain.calls.slice(0, 8).map((c, i) => (
+                    <tr key={i} style={{ borderBottom: '1px solid #21262d' }}>
+                      <td style={{ padding: '6px', fontFamily: 'monospace', fontSize: '13px' }}>${c.strike}</td>
+                      <td style={{ padding: '6px', color: '#3fb950', fontWeight: 'bold', fontSize: '13px' }}>${c.price.toFixed(2)}</td>
+                      <td style={{ padding: '6px', fontSize: '13px' }}>${c.bid.toFixed(2)}</td>
+                      <td style={{ padding: '6px', fontSize: '13px' }}>${c.ask.toFixed(2)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            
+            {/* Puts - 右边 */}
+            <div>
+              <h5 style={{ color: '#f0883e', marginBottom: '10px' }}>📉 Puts (看跌)</h5>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid #21262d' }}>
+                    <th style={{ padding: '6px', color: '#8b949e', fontSize: '12px' }}>Strike</th>
+                    <th style={{ padding: '6px', color: '#8b949e', fontSize: '12px' }}>Price</th>
+                    <th style={{ padding: '6px', color: '#8b949e', fontSize: '12px' }}>Bid</th>
+                    <th style={{ padding: '6px', color: '#8b949e', fontSize: '12px' }}>Ask</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {optionsChain.puts.slice(0, 8).map((p, i) => (
+                    <tr key={i} style={{ borderBottom: '1px solid #21262d' }}>
+                      <td style={{ padding: '6px', fontFamily: 'monospace', fontSize: '13px' }}>${p.strike}</td>
+                      <td style={{ padding: '6px', color: '#f0883e', fontWeight: 'bold', fontSize: '13px' }}>${p.price.toFixed(2)}</td>
+                      <td style={{ padding: '6px', fontSize: '13px' }}>${p.bid.toFixed(2)}</td>
+                      <td style={{ padding: '6px', fontSize: '13px' }}>${p.ask.toFixed(2)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}
