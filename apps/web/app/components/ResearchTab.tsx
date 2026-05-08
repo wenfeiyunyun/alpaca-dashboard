@@ -130,7 +130,7 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
                         const isATM = Math.abs(c.strike - optionsChain.price) < optionsChain.price * 0.01;
                         return (
                           <tr key={i} style={{ background: isATM ? '#1f3a5f' : 'transparent' }}>
-                            <td style={{ padding: '2px', fontFamily: 'monospace', fontWeight: isATM ? 'bold' : 'normal' }}>{c.strike.toFixed(0)}</td>
+                            <td style={{ padding: '2px', fontFamily: 'monospace', fontWeight: isATM ? 'bold' : 'normal' }}>{c.strike.toFixed(2)}</td>
                             <td style={{ padding: '2px', color: '#3fb950', fontWeight: isATM ? 'bold' : 'normal' }}>{c.price.toFixed(1)}</td>
                             <td style={{ padding: '2px' }}>{c.bid.toFixed(1)}</td>
                             <td style={{ padding: '2px' }}>{c.ask.toFixed(1)}</td>
@@ -158,7 +158,7 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
                         const isATM = Math.abs(p.strike - optionsChain.price) < optionsChain.price * 0.01;
                         return (
                           <tr key={i} style={{ background: isATM ? '#3d1f1f' : 'transparent' }}>
-                            <td style={{ padding: '2px', fontFamily: 'monospace', fontWeight: isATM ? 'bold' : 'normal' }}>{p.strike.toFixed(0)}</td>
+                            <td style={{ padding: '2px', fontFamily: 'monospace', fontWeight: isATM ? 'bold' : 'normal' }}>{p.strike.toFixed(2)}</td>
                             <td style={{ padding: '2px', color: '#f0883e', fontWeight: isATM ? 'bold' : 'normal' }}>{p.price.toFixed(1)}</td>
                             <td style={{ padding: '2px' }}>{p.bid.toFixed(1)}</td>
                             <td style={{ padding: '2px' }}>{p.ask.toFixed(1)}</td>
