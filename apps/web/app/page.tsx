@@ -74,6 +74,16 @@ export default function Dashboard() {
     setActiveTab('research');
   };
 
+  const handleSelectStrike = (strike: number, type: 'call' | 'put') => {
+    setTradeSymbol(optionsChain ? `${optionsChain.symbol}${type === 'call' ? 'C' : 'P'}${Math.floor(strike*1000)}` : '');
+    setTradePrice('');
+  };
+
+  const handleSelectBidAsk = (price: number, type: 'call' | 'put', ba: 'bid' | 'ask') => {
+    setTradeSymbol(optionsChain ? `${optionsChain.symbol}${type === 'call' ? 'C' : 'P'}${Math.floor(parseFloat(stockAnalysis?.price || '100')*1000)}` : '');
+    setTradePrice(price.toString());
+  };
+
   const handleTrade = async (side: string) => {
     if (!tradeSymbol) return;
     const order = { symbol: tradeSymbol, qty: tradeQty || '1', side, type: 'market' };
@@ -158,7 +168,7 @@ export default function Dashboard() {
             onAnalyzeStock={analyzeStock}
             onGetOptions={getOptions}
             analyzing={analyzing}
-            onSelectPrice={handleSelectPrice}
+            onSelectPrice={handleSelectPrice} onSelectStrike={handleSelectStrike} onSelectBidAsk={handleSelectBidAsk}
             tradeSymbol={tradeSymbol} tradePrice={tradePrice} tradeQty={tradeQty}
             setTradeSymbol={setTradeSymbol} setTradePrice={setTradePrice} setTradeQty={setTradeQty}
             onTrade={handleTrade}

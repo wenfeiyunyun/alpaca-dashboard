@@ -23,6 +23,8 @@ interface ResearchProps {
   onTrade?: (side: string) => void;
 
   onSelectPrice?: (strike: number, type: 'call' | 'put', price: number) => void;
+  onSelectStrike?: (strike: number, type: 'call' | 'put') => void;
+  onSelectBidAsk?: (price: number, type: 'call' | 'put', ba: 'bid' | 'ask') => void;
   candidates: Candidate[];
   stockAnalysis: StockAnalysis | null;
   optionsChain: OptionsChain | null;
@@ -32,7 +34,7 @@ interface ResearchProps {
   analyzing: boolean;
 }
 
-export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze, onAnalyzeStock, onGetOptions, analyzing, onSelectPrice, tradeSymbol, tradePrice, tradeQty, setTradeSymbol, setTradePrice, setTradeQty, onTrade }: ResearchProps) {
+export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze, onAnalyzeStock, onGetOptions, analyzing, onSelectPrice, tradeSymbol, tradePrice, tradeQty, setTradeSymbol, setTradePrice, setTradeQty, onTrade, onSelectStrike, onSelectBidAsk }: ResearchProps) {
   const [searchSymbol, setSearchSymbol] = useState('');
 
   return (
@@ -165,10 +167,10 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
                         const isATM = Math.abs(c.strike - optionsChain.price) < optionsChain.price * 0.01;
                         return (
                           <tr key={i} style={{ background: isATM ? '#1f3a5f' : 'transparent', cursor: 'pointer' }} onMouseEnter={e => e.currentTarget.style.background = isATM ? '#2a4a6f' : '#1f2a3a'} onMouseLeave={e => e.currentTarget.style.background = isATM ? '#1f3a5f' : 'transparent'}>
-                            <td style={{ padding: '1px', fontFamily: 'monospace', fontWeight: isATM ? 'bold' : 'normal' }}>{c.strike.toFixed(2)}</td>
+                            <td style={{ padding: '1px', fontFamily: 'monospace', fontWeight: isATM ? 'bold' : 'normal', cursor: 'pointer' }} onClick={() => onSelectStrike && onSelectStrike(c.strike, 'call')}>{c.strike.toFixed(2)}</td>
                             <td style={{ padding: '1px', color: '#3fb950', fontWeight: isATM ? 'bold' : 'normal', cursor: 'pointer' }} onClick={() => onSelectPrice && onSelectPrice(c.strike, 'call', c.price)}>{c.price.toFixed(1)}</td>
-                            <td style={{ padding: '1px' }}>{c.bid.toFixed(1)}</td>
-                            <td style={{ padding: '1px' }}>{c.ask.toFixed(1)}</td>
+                            <td style={{ padding: '1px', cursor: 'pointer' }} onClick={() => onSelectBidAsk && onSelectBidAsk(c.bid, 'call', 'bid')}>{c.bid.toFixed(1)}</td>
+                            <td style={{ padding: '1px', cursor: 'pointer' }} onClick={() => onSelectBidAsk && onSelectBidAsk(c.ask, 'call', 'ask')}>{c.ask.toFixed(1)}</td>
                           </tr>
                         );
                       })}
@@ -193,10 +195,10 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
                         const isATM = Math.abs(p.strike - optionsChain.price) < optionsChain.price * 0.01;
                         return (
                           <tr key={i} style={{ background: isATM ? '#3d1f1f' : 'transparent', cursor: 'pointer' }} onMouseEnter={e => e.currentTarget.style.background = isATM ? '#4d2f2f' : '#1f2a3a'} onMouseLeave={e => e.currentTarget.style.background = isATM ? '#3d1f1f' : 'transparent'}>
-                            <td style={{ padding: '1px', fontFamily: 'monospace', fontWeight: isATM ? 'bold' : 'normal' }}>{p.strike.toFixed(2)}</td>
+                            <td style={{ padding: '1px', fontFamily: 'monospace', fontWeight: isATM ? 'bold' : 'normal', cursor: 'pointer' }} onClick={() => onSelectStrike && onSelectStrike(p.strike, 'put')}>{p.strike.toFixed(2)}</td>
                             <td style={{ padding: '1px', color: '#f0883e', fontWeight: isATM ? 'bold' : 'normal', cursor: 'pointer' }} onClick={() => onSelectPrice && onSelectPrice(p.strike, 'put', p.price)}>{p.price.toFixed(1)}</td>
-                            <td style={{ padding: '1px' }}>{p.bid.toFixed(1)}</td>
-                            <td style={{ padding: '1px' }}>{p.ask.toFixed(1)}</td>
+                            <td style={{ padding: '1px', cursor: 'pointer' }} onClick={() => onSelectBidAsk && onSelectBidAsk(p.bid, 'put', 'bid')}>{p.bid.toFixed(1)}</td>
+                            <td style={{ padding: '1px', cursor: 'pointer' }} onClick={() => onSelectBidAsk && onSelectBidAsk(p.ask, 'put', 'ask')}>{p.ask.toFixed(1)}</td>
                           </tr>
                         );
                       })}
