@@ -28,7 +28,7 @@ interface ResearchProps {
 
   onSelectPrice?: (strike: number, type: 'call' | 'put', price: number) => void;
   onSelectStrike?: (strike: number, type: 'call' | 'put') => void;
-  onSelectBidAsk?: (strike: number, type: 'call' | 'put', price: number) => void;
+  onSelectBidAsk?: (price: number, type: 'call' | 'put', ba: 'bid' | 'ask') => void;
   candidates: Candidate[];
   stockAnalysis: StockAnalysis | null;
   optionsChain: OptionsChain | null;
@@ -50,11 +50,13 @@ const parseOption = (opt: string): { symbol: string; expiry: string; type: strin
   return { symbol, expiry, type, strike: strikeRaw, strikeNum };
 };
 
-// 格式化显示: TSLA260510C0036750B
+// 格式化显示: TSLA | 260508 | P | $367.5 | BUY
 const formatOrderDisplay = (symbol: string, side: string) => {
   if (!symbol) return '';
-  const sideChar = side === 'buy' ? 'B' : side === 'sell' ? 'S' : '';
-  return `${symbol}${sideChar}`;
+  const parsed = parseOption(symbol);
+  if (!parsed) return symbol;
+  const sideStr = side === 'buy' ? 'BUY' : side === 'sell' ? 'SELL' : '';
+  return `${parsed.symbol} | ${parsed.expiry} | ${parsed.type} | $${parsed.strikeNum.toFixed(1)} | ${sideStr}`;
 };
 
 export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze, onAnalyzeStock, onGetOptions, analyzing, onSelectPrice, tradeSymbol, tradePrice, tradeQty, setTradeSymbol, setTradePrice, setTradeQty, onTrade, onSelectStrike, onSelectBidAsk, tradeExpiry, setTradeExpiry }: ResearchProps) {
@@ -151,14 +153,14 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
               {/* Order Display: TSLA | 260508 | P | $367.5 | BUY */}
               <div style={{ display: 'flex', justifyContent: 'center', gap: '6px', marginBottom: '6px', padding: '6px', background: '#0d1117', borderRadius: '4px' }}>
                 <span style={{ fontSize: '11px', fontFamily: 'monospace', color: orderDisplay ? (orderDisplay.includes('C') ? '#3fb950' : orderDisplay.includes('P') ? '#f0883e' : '#58a6ff') : '#8b949e', fontWeight: 'bold' }}>
-                  {orderDisplay || (tradeSymbol ? tradeSymbol + ' (select B/S)' : 'Select contract')}
+                  {orderDisplay || (tradeSymbol ? tradeSymbol + ' (select B/S)' : 'Select option first')}
                 </span>
               </div>
               
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '4px' }}>
                 <input placeholder='Symbol' value={tradeSymbol || ''} onChange={e => { setTradeSymbol?.(e.target.value); setTradeSide(''); }} style={{ padding: '5px', background: '#0d1117', border: '1px solid #21262d', color: '#e6edf3', fontSize: '10px', borderRadius: '3px' }} />
                 <input placeholder='Price' value={tradePrice || ''} onChange={e => setTradePrice?.(e.target.value)} style={{ padding: '5px', background: '#0d1117', border: '1px solid #21262d', color: '#e6edf3', fontSize: '10px', borderRadius: '3px' }} />
-                <select value={tradeExpiry || '1'} onChange={e => setTradeExpiry?.(e.target.value)} style={{ padding: '5px', background: '#0d1117', border: '1px solid #21262d', color: '#e6edf3', fontSize: '10px', borderRadius: '3px' }}>
+                <select value={tradeExpiry || ''} onChange={e => setTradeExpiry?.(e.target.value)} style={{ padding: '5px', background: '#0d1117', border: '1px solid #21262d', color: '#e6edf3', fontSize: '10px', borderRadius: '3px' }}>
                 <option value=''>过期天</option>
                 <option value='1'>1天</option>
                 <option value='2'>2天</option>
@@ -170,7 +172,7 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
                 <option value='27'>27天</option>
                 <option value='34'>34天</option>
               </select>
-              <input placeholder='天地天地' value={tradeQty || '天地天地'} onChange={e => setTradeQty?.(e.target.value)} style={{ padding: '5px', background: '#0d1117', border: '1px solid #21262d', color: '#e6edf3', fontSize: '10px', borderRadius: '3px' }} />
+              <input placeholder='Qty' value={tradeQty || '1'} onChange={e => setTradeQty?.(e.target.value)} style={{ padding: '5px', background: '#0d1117', border: '1px solid #21262d', color: '#e6edf3', fontSize: '10px', borderRadius: '3px' }} />
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px', marginTop: '4px' }}>
                 <button onClick={() => handleTrade('buy')} style={{ padding: '6px', background: tradeSide === 'buy' ? '#2ea043' : '#238636', border: 'none', color: 'white', borderRadius: '3px', fontSize: '10px', fontWeight: 'bold', cursor: 'pointer' }}>BUY</button>
@@ -219,8 +221,8 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
                           <tr key={i} style={{ background: isATM ? '#1f3a5f' : 'transparent', cursor: 'pointer' }} onMouseEnter={e => e.currentTarget.style.background = isATM ? '#2a4a6f' : '#1f2a3a'} onMouseLeave={e => e.currentTarget.style.background = isATM ? '#1f3a5f' : 'transparent'}>
                             <td style={{ padding: '1px', fontFamily: 'monospace', fontWeight: isATM ? 'bold' : 'normal', cursor: 'pointer' }} onClick={() => onSelectStrike && onSelectStrike(c.strike, 'call')}>{c.strike.toFixed(2)}</td>
                             <td style={{ padding: '1px', color: '#3fb950', fontWeight: isATM ? 'bold' : 'normal', cursor: 'pointer' }} onClick={() => onSelectPrice && onSelectPrice(c.strike, 'call', c.price)}>{c.price.toFixed(1)}</td>
-                            <td style={{ padding: '1px', cursor: 'pointer' }} onClick={() => onSelectBidAsk && onSelectBidAsk(c.strike, 'call', c.bid)}>{c.bid.toFixed(1)}</td>
-                            <td style={{ padding: '1px', cursor: 'pointer' }} onClick={() => onSelectBidAsk && onSelectBidAsk(c.strike, 'call', c.ask)}>{c.ask.toFixed(1)}</td>
+                            <td style={{ padding: '1px', cursor: 'pointer' }} onClick={() => onSelectBidAsk && onSelectBidAsk(c.bid, 'call', 'bid')}>{c.bid.toFixed(1)}</td>
+                            <td style={{ padding: '1px', cursor: 'pointer' }} onClick={() => onSelectBidAsk && onSelectBidAsk(c.ask, 'call', 'ask')}>{c.ask.toFixed(1)}</td>
                           </tr>
                         );
                       })}
@@ -247,8 +249,8 @@ export function ResearchTab({ candidates, stockAnalysis, optionsChain, onAnalyze
                           <tr key={i} style={{ background: isATM ? '#3d1f1f' : 'transparent', cursor: 'pointer' }} onMouseEnter={e => e.currentTarget.style.background = isATM ? '#4d2f2f' : '#1f2a3a'} onMouseLeave={e => e.currentTarget.style.background = isATM ? '#3d1f1f' : 'transparent'}>
                             <td style={{ padding: '1px', fontFamily: 'monospace', fontWeight: isATM ? 'bold' : 'normal', cursor: 'pointer' }} onClick={() => onSelectStrike && onSelectStrike(p.strike, 'put')}>{p.strike.toFixed(2)}</td>
                             <td style={{ padding: '1px', color: '#f0883e', fontWeight: isATM ? 'bold' : 'normal', cursor: 'pointer' }} onClick={() => onSelectPrice && onSelectPrice(p.strike, 'put', p.price)}>{p.price.toFixed(1)}</td>
-                            <td style={{ padding: '1px', cursor: 'pointer' }} onClick={() => onSelectBidAsk && onSelectBidAsk(p.strike, 'put', p.bid)}>{p.bid.toFixed(1)}</td>
-                            <td style={{ padding: '1px', cursor: 'pointer' }} onClick={() => onSelectBidAsk && onSelectBidAsk(p.strike, 'put', p.ask)}>{p.ask.toFixed(1)}</td>
+                            <td style={{ padding: '1px', cursor: 'pointer' }} onClick={() => onSelectBidAsk && onSelectBidAsk(p.bid, 'put', 'bid')}>{p.bid.toFixed(1)}</td>
+                            <td style={{ padding: '1px', cursor: 'pointer' }} onClick={() => onSelectBidAsk && onSelectBidAsk(p.ask, 'put', 'ask')}>{p.ask.toFixed(1)}</td>
                           </tr>
                         );
                       })}

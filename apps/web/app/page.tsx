@@ -7,6 +7,33 @@ import type { Candidate, StockAnalysis, OptionsChain } from './types';
 const TABS = ['holdings', 'trade', 'research'] as const;
 type Tab = typeof TABS[number];
 
+// 格式化行权价为7位数字 (不带小数点): 367.5 -> 0367500
+const formatStrike = (strike: number): string => {
+  return Math.floor(strike * 10000).toString().padStart(8, '0');
+};
+
+// 解析期权代码: TSLA260508P00367500 -> {symbol: TSLA, expiry: 260508, type: P, strike: 003675}
+// 解析期权代码: TSLA260511P00412500 (19位) -> {symbol: TSLA, expiry: 260511, type: P, strike: 0041250}
+const parseOptionSymbol = (opt: string): { symbol: string; expiry: string; type: string; strike: string } | null => {
+  if (!opt || opt.length < 17) return null;
+  return { 
+    symbol: opt.substring(0, 4), 
+    expiry: opt.substring(4, 10), 
+    type: opt.substring(10, 11), 
+    strike: opt.substring(11, 18) 
+  };
+};
+
+// 计算到期日期: 有效天数 + 今天 = 到期日 (格式: YYMMDD)
+const formatExpiryDate = (days: number): string => {
+  const today = new Date();
+  const expiry = new Date(today.getTime() + days * 24 * 60 * 60 * 1000);
+  const yy = expiry.getFullYear().toString().slice(-2);
+  const mm = (expiry.getMonth() + 1).toString().padStart(2, '0');
+  const dd = expiry.getDate().toString().padStart(2, '0');
+  return `${yy}${mm}${dd}`;
+};
+
 export default function Dashboard() {
   const [account, setAccount] = useState<any>(null);
   const [positions, setPositions] = useState<any[]>([]);
@@ -14,7 +41,7 @@ export default function Dashboard() {
   const [clock, setClock] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<Tab>('holdings');
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState(""); const [tradeSymbol, setTradeSymbol] = useState(""); const [tradePrice, setTradePrice] = useState(""); const [tradeExpiry, setTradeExpiry] = useState(""); const [tradeQty, setTradeQty] = useState("1");
+  const [message, setMessage] = useState(""); const [tradeSymbol, setTradeSymbol] = useState(""); const [tradePrice, setTradePrice] = useState(""); const [tradeExpiry, setTradeExpiry] = useState("1"); const [tradeQty, setTradeQty] = useState("1");
   
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [stockAnalysis, setStockAnalysis] = useState<StockAnalysis | null>(null);
@@ -69,20 +96,24 @@ export default function Dashboard() {
   };
 
   const handleSelectPrice = (strike: number, type: 'call' | 'put', price: number) => {
-    setTradeSymbol(optionsChain ? `${optionsChain.symbol}${type === 'call' ? 'C' : 'P'}${Math.floor(strike)}` : '');
+    const days = tradeExpiry ? Math.floor(parseFloat(tradeExpiry)) : 1;
+    const expiry = formatExpiryDate(days);
+    setTradeSymbol(optionsChain ? `${optionsChain.symbol}${expiry}${type === 'call' ? 'C' : 'P'}${formatStrike(strike)}` : '');
     setTradePrice(price.toString());
     setActiveTab('research');
   };
 
   const handleSelectStrike = (strike: number, type: 'call' | 'put') => {
-    const expiry = tradeExpiry ? Math.floor(parseFloat(tradeExpiry)) : 34;
-    setTradeSymbol(optionsChain ? `${optionsChain.symbol}${type === 'call' ? 'C' : 'P'}${Math.floor(strike)}${expiry}` : '');
+    const days = tradeExpiry ? Math.floor(parseFloat(tradeExpiry)) : 1;
+    const expiry = formatExpiryDate(days);
+    setTradeSymbol(optionsChain ? `${optionsChain.symbol}${expiry}${type === 'call' ? 'C' : 'P'}${formatStrike(strike)}` : '');
     setTradePrice('');
   };
 
-  const handleSelectBidAsk = (price: number, type: 'call' | 'put', ba: 'bid' | 'ask') => {
-    const expiry = tradeExpiry ? Math.floor(parseFloat(tradeExpiry)) : 34;
-    setTradeSymbol(optionsChain ? `${optionsChain.symbol}${type === 'call' ? 'C' : 'P'}${Math.floor(parseFloat(stockAnalysis?.price || '100'))}${expiry}` : '');
+  const handleSelectBidAsk = (strike: number, type: 'call' | 'put', price: number) => {
+    const days = tradeExpiry ? Math.floor(parseFloat(tradeExpiry)) : 1;
+    const expiry = formatExpiryDate(days);
+    setTradeSymbol(optionsChain ? `${optionsChain.symbol}${expiry}${type === 'call' ? 'C' : 'P'}${formatStrike(strike)}` : '');
     setTradePrice(price.toString());
   };
 
